@@ -1,0 +1,6 @@
+Title: Data theft from cloud storage (sample)
+Source: SAMPLE summary written for this project (synthetic) - replace with a real public CTI report
+Published: n/a
+Actors: BucketBandit
+
+The actor tracked as BucketBandit abused valid cloud accounts (T1078.004) to enumerate object storage and copy sensitive files out of cloud storage (T1530). Victims had broad read permissions and no access logging on their buckets. Exfiltration went to 198.51.100.23.

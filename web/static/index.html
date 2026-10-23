@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI-CSPM Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>AI-CSPM</h1>
+      <p class="sub">Cloud misconfigurations &rarr; MITRE ATT&amp;CK &rarr; CTI relevance &rarr; explainable risk score</p>
+    </div>
+    <div class="controls">
+      <label>Run
+        <select id="runSelect" aria-label="Select scan run"></select>
+      </label>
+      <button id="demoBtn" type="button">Run demo scan</button>
+      <label class="filebtn">Scan your config
+        <input id="fileInput" type="file" accept=".json,.yaml,.yml">
+      </label>
+    </div>
+  </header>
+
+  <p id="status" role="status" aria-live="polite"></p>
+
+  <main>
+    <section id="metrics" class="cards" aria-label="Summary"></section>
+
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button role="tab" class="tab active" data-tab="findings" aria-selected="true">Findings</button>
+      <button role="tab" class="tab" data-tab="compare" aria-selected="false">Baseline vs fused</button>
+      <button role="tab" class="tab" data-tab="cti" aria-selected="false">CTI evidence</button>
+      <button role="tab" class="tab" data-tab="eval" aria-selected="false">Evaluation</button>
+    </nav>
+
+    <section id="tab-findings" class="panel">
+      <div class="filters">
+        <input id="search" type="search" placeholder="Search resource, check or technique" aria-label="Search findings">
+        <select id="priorityFilter" aria-label="Filter by priority">
+          <option value="">All priorities</option>
+          <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
+        </select>
+        <select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option></select>
+      </div>
+      <div class="tablewrap"><table id="findingsTable"></table></div>
+      <p class="hint">Click a row for the full explanation. Click a column header to sort.</p>
+    </section>
+
+    <section id="tab-compare" class="panel hidden">
+      <p class="hint">Rank 1 is the most urgent. &ldquo;Baseline&rdquo; uses severity only; &ldquo;Fused&rdquo; uses severity &times; asset criticality &times; (1 + CTI weight).</p>
+      <div id="bars"></div>
+      <div class="tablewrap"><table id="compareTable"></table></div>
+    </section>
+
+    <section id="tab-cti" class="panel hidden">
+      <h2>Reports mentioning each technique</h2>
+      <div id="ctiBars"></div>
+      <div class="tablewrap"><table id="ctiTable"></table></div>
+    </section>
+
+    <section id="tab-eval" class="panel hidden">
+      <div id="evalBody"></div>
+    </section>
+  </main>
+
+  <aside id="drawer" class="drawer hidden" aria-label="Finding details">
+    <button id="closeDrawer" type="button" aria-label="Close details">&times;</button>
+    <div id="drawerBody"></div>
+  </aside>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

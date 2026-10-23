@@ -1,0 +1,79 @@
+{
+  "description": "Borderline cases at rule thresholds (expect only S3-03 on legacy-reports)",
+  "account": {
+    "root_mfa_enabled": true,
+    "root_last_used_days": 31,
+    "password_policy": {
+      "min_length": 14
+    }
+  },
+  "iam_users": [
+    {
+      "name": "carol",
+      "criticality": "medium",
+      "console_access": true,
+      "mfa_enabled": true,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLE0201",
+          "age_days": 90,
+          "last_used_days": 45
+        }
+      ]
+    }
+  ],
+  "iam_policies": [
+    {
+      "name": "ReadAllObjects",
+      "criticality": "medium",
+      "document": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "*"
+          }
+        ]
+      }
+    }
+  ],
+  "s3_buckets": [
+    {
+      "name": "legacy-reports",
+      "criticality": "medium",
+      "public_read": false,
+      "public_write": false,
+      "block_public_access": false,
+      "encryption_enabled": true,
+      "logging_enabled": true,
+      "versioning_enabled": true
+    }
+  ],
+  "security_groups": [
+    {
+      "id": "sg-vpn",
+      "name": "sg-vpn",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 22,
+          "port_to": 22,
+          "cidr": "203.0.113.0/24"
+        },
+        {
+          "protocol": "tcp",
+          "port_from": 8080,
+          "port_to": 8080,
+          "cidr": "0.0.0.0/0"
+        },
+        {
+          "protocol": "tcp",
+          "port_from": 443,
+          "port_to": 443,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    }
+  ]
+}

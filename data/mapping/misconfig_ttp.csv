@@ -1,0 +1,23 @@
+check_id,technique_id,technique_name,rationale
+IAM-01,T1078.004,Valid Accounts: Cloud Accounts,Over-privileged identities let a stolen credential act as full admin
+IAM-02,T1078.004,Valid Accounts: Cloud Accounts,Service-wide wildcard permissions widen what a stolen credential can do
+IAM-03,T1078.004,Valid Accounts: Cloud Accounts,Root without MFA is a single-factor valid account
+IAM-04,T1078.004,Valid Accounts: Cloud Accounts,Routine root use increases exposure of the most powerful account
+IAM-05,T1078.004,Valid Accounts: Cloud Accounts,Console users without MFA are easier to take over
+IAM-05,T1110,Brute Force,Single-factor console logins can be guessed or sprayed
+IAM-06,T1552,Unsecured Credentials,Long-lived keys are more likely to be leaked or found on disk
+IAM-07,T1078.004,Valid Accounts: Cloud Accounts,Forgotten keys give unnoticed access to attackers
+IAM-08,T1110,Brute Force,Short passwords are cheaper to guess
+S3-01,T1530,Data from Cloud Storage,Public read lets anyone download objects
+S3-02,T1530,Data from Cloud Storage,Public write exposes the bucket to tampering and abuse
+S3-02,T1485,Data Destruction,Public write allows deletion or overwrite of objects
+S3-03,T1530,Data from Cloud Storage,Without Block Public Access a later policy change can expose data
+S3-04,T1530,Data from Cloud Storage,Unencrypted data is easier to use once the bucket is reached
+S3-05,T1562.008,Impair Defenses: Disable or Modify Cloud Logs,Missing access logs hide data access from defenders
+S3-06,T1485,Data Destruction,Without versioning deleted or overwritten objects cannot be restored
+NET-01,T1190,Exploit Public-Facing Application,Internet-reachable SSH is a direct attack surface
+NET-01,T1133,External Remote Services,SSH is a remote access service
+NET-02,T1190,Exploit Public-Facing Application,Internet-reachable RDP is a direct attack surface
+NET-02,T1021.001,Remote Services: Remote Desktop Protocol,RDP exposure enables remote desktop abuse
+NET-03,T1190,Exploit Public-Facing Application,Internet-reachable databases are directly attackable
+NET-04,T1190,Exploit Public-Facing Application,All ports open exposes every listening service

@@ -1,0 +1,17 @@
+{
+  "_note": "Manual labels for a SUBSET of reports. Re-label against your own real reports.",
+  "R1_cloud_credential_theft": [
+    "T1552.001",
+    "T1078.004",
+    "T1530"
+  ],
+  "R5_rdp_brute_force": [
+    "T1110",
+    "T1021.001",
+    "T1133"
+  ],
+  "R6_log_tampering": [
+    "T1562.008",
+    "T1078.004"
+  ]
+}

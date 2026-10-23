@@ -1,0 +1,6 @@
+Title: Exploitation of internet-facing services (sample)
+Source: SAMPLE summary written for this project (synthetic) - replace with a real public CTI report
+Published: n/a
+Actors: PortProwler
+
+PortProwler scanned cloud address ranges for exposed management ports and exploited a public-facing application to gain a foothold (T1190). Where remote access services were reachable from the internet, the operators connected directly (T1133). The scanning source was 203.0.113.77.

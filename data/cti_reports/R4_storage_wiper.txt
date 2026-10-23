@@ -1,0 +1,6 @@
+Title: Destructive attacks on cloud data (sample)
+Source: SAMPLE summary written for this project (synthetic) - replace with a real public CTI report
+Published: n/a
+Actors: VaultBreaker
+
+The group named VaultBreaker entered through an exposed service (T1190), copied data from cloud storage (T1530) and then deleted objects and backups to cause outages (T1485). Buckets without versioning could not be restored. Payload hash: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.

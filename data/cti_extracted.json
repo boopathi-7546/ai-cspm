@@ -1,0 +1,272 @@
+[
+  {
+    "report_id": "R1_cloud_credential_theft",
+    "title": "Cloud credential theft campaign (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "CloudHarvest"
+    ],
+    "iocs": {
+      "ipv4": [
+        "203.0.113.45"
+      ],
+      "domains": [
+        "update-check.example-c2.com"
+      ],
+      "sha256": [],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1078.004",
+        "evidence": "The harvested keys were then used to sign in to cloud accounts as if they were legitimate users (T1078.004).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1530",
+        "evidence": "In one intrusion the operators listed storage buckets and downloaded objects from them (T1530).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1552.001",
+        "evidence": "Analysts tracked a group known as CloudHarvest that searched compromised hosts for AWS credential files and collected access keys stored on disk (T1552.001).",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "report_id": "R2_storage_data_theft",
+    "title": "Data theft from cloud storage (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "BucketBandit"
+    ],
+    "iocs": {
+      "ipv4": [
+        "198.51.100.23"
+      ],
+      "domains": [],
+      "sha256": [],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1078.004",
+        "evidence": "The actor tracked as BucketBandit abused valid cloud accounts (T1078.004) to enumerate object storage and copy sensitive files out of cloud storage (T1530).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1530",
+        "evidence": "The actor tracked as BucketBandit abused valid cloud accounts (T1078.004) to enumerate object storage and copy sensitive files out of cloud storage (T1530).",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "report_id": "R3_exposed_services",
+    "title": "Exploitation of internet-facing services (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "PortProwler"
+    ],
+    "iocs": {
+      "ipv4": [
+        "203.0.113.77"
+      ],
+      "domains": [],
+      "sha256": [],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1133",
+        "evidence": "Where remote access services were reachable from the internet, the operators connected directly (T1133).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1190",
+        "evidence": "PortProwler scanned cloud address ranges for exposed management ports and exploited a public-facing application to gain a foothold (T1190).",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "report_id": "R4_storage_wiper",
+    "title": "Destructive attacks on cloud data (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "VaultBreaker"
+    ],
+    "iocs": {
+      "ipv4": [],
+      "domains": [],
+      "sha256": [
+        "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+      ],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1190",
+        "evidence": "The group named VaultBreaker entered through an exposed service (T1190), copied data from cloud storage (T1530) and then deleted objects and backups to cause outages (T1485).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1485",
+        "evidence": "The group named VaultBreaker entered through an exposed service (T1190), copied data from cloud storage (T1530) and then deleted objects and backups to cause outages (T1485).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1530",
+        "evidence": "The group named VaultBreaker entered through an exposed service (T1190), copied data from cloud storage (T1530) and then deleted objects and backups to cause outages (T1485).",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "report_id": "R5_rdp_brute_force",
+    "title": "Remote desktop brute force against cloud hosts (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "RDPReaper"
+    ],
+    "iocs": {
+      "ipv4": [
+        "198.51.100.99"
+      ],
+      "domains": [
+        "rdp-check.example-scan.net"
+      ],
+      "sha256": [],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1021.001",
+        "evidence": "RDPReaper ran brute force attacks (T1110) against cloud virtual machines whose remote desktop port was open to the internet (T1021.001).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1110",
+        "evidence": "RDPReaper ran brute force attacks (T1110) against cloud virtual machines whose remote desktop port was open to the internet (T1021.001).",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1133",
+        "evidence": "The exposed remote access service gave them an entry point (T1133).",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "report_id": "R6_log_tampering",
+    "title": "Defence evasion in cloud accounts (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "LogGhost"
+    ],
+    "iocs": {
+      "ipv4": [],
+      "domains": [],
+      "sha256": [],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1078.004",
+        "evidence": "The group tracked as LogGhost signed in using stolen credentials and then disabled CloudTrail logging in the account before copying data.",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1562.008",
+        "evidence": "The group tracked as LogGhost signed in using stolen credentials and then disabled CloudTrail logging in the account before copying data.",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "report_id": "R7_exposed_docker_mining",
+    "title": "Cryptomining through exposed APIs (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "MineWorm"
+    ],
+    "iocs": {
+      "ipv4": [],
+      "domains": [],
+      "sha256": [
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1190",
+        "evidence": "Operators known as MineWorm found an exposed Docker API on cloud instances and launched containers that ran a cryptocurrency miner.",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1496",
+        "evidence": "Operators known as MineWorm found an exposed Docker API on cloud instances and launched containers that ran a cryptocurrency miner.",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  },
+  {
+    "report_id": "R8_phishing_to_cloud",
+    "title": "Phishing leading to cloud account takeover (sample)",
+    "source": "SAMPLE summary written for this project (synthetic) - replace with a real public CTI report",
+    "published": "n/a",
+    "method": "offline",
+    "actors": [
+      "PhishNet"
+    ],
+    "iocs": {
+      "ipv4": [],
+      "domains": [
+        "login-portal.example-phish.com"
+      ],
+      "sha256": [],
+      "md5": []
+    },
+    "techniques": [
+      {
+        "id": "T1078.004",
+        "evidence": "Where multi-factor authentication was absent, the actor reused the credentials to access cloud accounts (T1078.004), and repeated password guessing (T1110) was seen against accounts that did not respond.",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1110",
+        "evidence": "Where multi-factor authentication was absent, the actor reused the credentials to access cloud accounts (T1078.004), and repeated password guessing (T1110) was seen against accounts that did not respond.",
+        "evidence_verified": true
+      },
+      {
+        "id": "T1566",
+        "evidence": "PhishNet sent targeted phishing messages (T1566) to harvest employee logins.",
+        "evidence_verified": true
+      }
+    ],
+    "rejected": []
+  }
+]

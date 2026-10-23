@@ -1,0 +1,96 @@
+{
+  "description": "Correctly configured environment - negative test case (expect zero findings)",
+  "account": {
+    "root_mfa_enabled": true,
+    "root_last_used_days": 200,
+    "password_policy": {
+      "min_length": 16,
+      "require_symbols": true
+    }
+  },
+  "iam_users": [
+    {
+      "name": "eng-dana",
+      "criticality": "medium",
+      "console_access": true,
+      "mfa_enabled": true,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLE0101",
+          "age_days": 20,
+          "last_used_days": 1
+        }
+      ]
+    },
+    {
+      "name": "svc-reports",
+      "criticality": "medium",
+      "console_access": false,
+      "mfa_enabled": false,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLE0102",
+          "age_days": 45,
+          "last_used_days": 3
+        }
+      ]
+    }
+  ],
+  "iam_policies": [
+    {
+      "name": "ReportsBucketRead",
+      "criticality": "medium",
+      "document": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject"
+            ],
+            "Resource": "arn:aws:s3:::reports-prod/*"
+          }
+        ]
+      }
+    }
+  ],
+  "s3_buckets": [
+    {
+      "name": "reports-prod",
+      "criticality": "high",
+      "public_read": false,
+      "public_write": false,
+      "block_public_access": true,
+      "encryption_enabled": true,
+      "logging_enabled": true,
+      "versioning_enabled": true
+    }
+  ],
+  "security_groups": [
+    {
+      "id": "sg-web-ok",
+      "name": "sg-web-ok",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 443,
+          "port_to": 443,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "id": "sg-admin-ok",
+      "name": "sg-admin-ok",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 22,
+          "port_to": 22,
+          "cidr": "10.0.0.0/8"
+        }
+      ]
+    }
+  ]
+}

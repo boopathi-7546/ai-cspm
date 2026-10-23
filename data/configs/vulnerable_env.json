@@ -1,0 +1,200 @@
+{
+  "description": "Intentionally vulnerable sample environment (hand-authored)",
+  "account": {
+    "root_mfa_enabled": false,
+    "root_last_used_days": 5,
+    "password_policy": {
+      "min_length": 8,
+      "require_symbols": false
+    }
+  },
+  "iam_users": [
+    {
+      "name": "dev-alice",
+      "criticality": "medium",
+      "console_access": true,
+      "mfa_enabled": false,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLE0001",
+          "age_days": 210,
+          "last_used_days": 5
+        }
+      ]
+    },
+    {
+      "name": "svc-backup",
+      "criticality": "high",
+      "console_access": false,
+      "mfa_enabled": false,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLE0002",
+          "age_days": 400,
+          "last_used_days": 120
+        }
+      ]
+    },
+    {
+      "name": "ops-bob",
+      "criticality": "medium",
+      "console_access": true,
+      "mfa_enabled": true,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLE0003",
+          "age_days": 30,
+          "last_used_days": 2
+        }
+      ]
+    }
+  ],
+  "iam_policies": [
+    {
+      "name": "AdminAll",
+      "criticality": "high",
+      "document": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "*",
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "S3FullAccessAll",
+      "criticality": "medium",
+      "document": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReadOnlyLogs",
+      "criticality": "low",
+      "document": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:GetLogEvents"
+            ],
+            "Resource": "arn:aws:logs:ap-south-1:111122223333:log-group:app:*"
+          }
+        ]
+      }
+    }
+  ],
+  "s3_buckets": [
+    {
+      "name": "customer-data-prod",
+      "criticality": "high",
+      "public_read": true,
+      "public_write": false,
+      "block_public_access": false,
+      "encryption_enabled": false,
+      "logging_enabled": false,
+      "versioning_enabled": false
+    },
+    {
+      "name": "test-scratch-bucket",
+      "criticality": "low",
+      "public_read": true,
+      "public_write": true,
+      "block_public_access": false,
+      "encryption_enabled": false,
+      "logging_enabled": false,
+      "versioning_enabled": false
+    },
+    {
+      "name": "app-logs-internal",
+      "criticality": "medium",
+      "public_read": false,
+      "public_write": false,
+      "block_public_access": true,
+      "encryption_enabled": true,
+      "logging_enabled": true,
+      "versioning_enabled": true
+    }
+  ],
+  "security_groups": [
+    {
+      "id": "sg-web-01",
+      "name": "sg-web-01",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 443,
+          "port_to": 443,
+          "cidr": "0.0.0.0/0"
+        },
+        {
+          "protocol": "tcp",
+          "port_from": 22,
+          "port_to": 22,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "id": "sg-db-01",
+      "name": "sg-db-01",
+      "criticality": "high",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 3306,
+          "port_to": 3306,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "id": "sg-rdp",
+      "name": "sg-rdp",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 3389,
+          "port_to": 3389,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "id": "sg-open-all",
+      "name": "sg-open-all",
+      "criticality": "low",
+      "ingress": [
+        {
+          "protocol": "-1",
+          "port_from": 0,
+          "port_to": 65535,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "id": "sg-internal-ssh",
+      "name": "sg-internal-ssh",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 22,
+          "port_to": 22,
+          "cidr": "10.0.0.0/8"
+        }
+      ]
+    }
+  ]
+}
