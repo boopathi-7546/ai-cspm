@@ -1,0 +1,6 @@
+Title: EmeraldWhale: exposed Git configs and .env files harvested for cloud credentials
+Source: Sysdig Threat Research Team (Oct 2024). Paraphrased summary by the project team from public coverage: https://www.theregister.com/2024/10/31/emeraldwhale_credential_theft and https://www.securityweek.com/honeypot-surprise-researchers-catch-attackers-exposing-15000-stolen-credentials-in-s3-bucket/
+Published: 2024-10
+Actors: EmeraldWhale
+
+Sysdig researchers uncovered the operation tracked as EmeraldWhale after noticing a ListBuckets request, made with a compromised account, against an S3 bucket they did not own. The actor scanned the internet between August and September for web servers that exposed Git configuration files and Laravel environment files, and found about 67,000 exposed Git config paths. Credentials embedded in those files were harvested, private repositories were cloned, and further cloud credentials were extracted from the source code. More than 15,000 stolen credentials were stored in a publicly exposed S3 bucket that belonged to an earlier victim of the same campaign.

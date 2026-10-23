@@ -1,0 +1,6 @@
+Title: Docker Engine API cryptojacking with Docker Swarm command and control
+Source: Datadog Security Research (Oct 2024). Paraphrased summary by the project team from: https://securitylabs.datadoghq.com/articles/threat-actors-leveraging-docker-swarm-kubernetes-mine-cryptocurrency/
+Published: 2024-10
+Actors: 
+
+Datadog Security Research described a cryptojacking campaign aimed at Docker Engine API endpoints that were exposed to the internet without authentication. The attackers found targets with internet scanning tools (masscan and ZGrab), then ran a container with the host filesystem mounted. Follow-on payloads moved laterally to other Docker hosts, Kubernetes kubelet APIs and SSH servers, and finally downloaded and started a cryptocurrency miner. Compromised hosts were joined to a Docker Swarm controlled by the attacker, which gave them command and control through Swarm orchestration.

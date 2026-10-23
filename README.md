@@ -13,7 +13,7 @@ CTI reports (.txt) -> extractor (LLM optional, validated) -> evidence index â”€â
 ```bash
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-pytest -q                     # 35 tests
+pytest -q                     # 36 tests
 python run.py demo            # extract CTI, scan 3 sample envs, evaluate
 python run.py dashboard       # http://127.0.0.1:5000  (click "Run demo scan")
 ```
@@ -32,7 +32,7 @@ cspm/        scanner, rules, mapping, CTI extractor, fusion, db, evaluation (pur
 web/app.py   Flask JSON API  (/api/runs, /api/runs/<id>, /api/cti, /api/scan, /api/scan/demo, /api/evaluation)
 web/static/  index.html + style.css + app.js  (the dashboard; plain HTML/CSS/JS, no build step)
 data/        sample configs, CTI reports, ATT&CK mapping CSV, ground-truth labels
-tests/       35 pytest tests (rules, fusion, extractor, pipeline, web API)
+tests/       36 pytest tests (rules, fusion, extractor, pipeline, web API)
 ```
 Dashboard security notes: the page is served with a strict Content-Security-Policy, all data is inserted with
 `textContent` (a resource named `<img onerror=...>` stays text), uploads are limited to 1 MB `.json/.yaml/.yml`,
@@ -58,15 +58,39 @@ the `@rule(...)` decorator in `cspm/rules.py` and a row in the mapping CSV.
 Reports detection precision/recall and false-positive resource rate against hand-labelled sample configs,
 CTI extraction precision/recall on a labelled subset, and baseline (severity-only) vs fused ranking.
 
+## Results on the shipped data (`python run.py demo`)
+| Measure | Value | How to read it |
+|---|---|---|
+| Detection precision / recall | 1.0 / 1.0 | Only shows the rules match the hand-written labels for the 3 sample configs. Not real-world accuracy. |
+| CTI extraction (offline), all labelled techniques | precision 0.889, recall 0.615 | 8 reports, 26 labelled techniques. |
+| CTI extraction (offline), techniques the risk score can use | precision 1.0, recall 0.588 | Parent/child IDs count as a match (as in fusion). |
+| Ranking on `vulnerable_env` | top-5 overlap 4/5, mean rank change 3.25 | CTI + criticality reorders the severity-only list. |
+| Findings with CTI support | 18 of 24 | S3-01, S3-03, S3-04 get no CTI boost because the offline extractor missed T1530. |
+
+The last row is a real limitation, not a bug: reports R01 and R06 do describe theft from S3, but the offline
+keyword extractor does not recognise that wording, so public-bucket findings lose their CTI boost. Run
+`python run.py extract --llm` (needs `ANTHROPIC_API_KEY`; this path could not be tested without a key) and
+compare. "Offline vs LLM extraction" is a good experiment for your report. The keyword map in
+`cspm/cti_extractor.py` was written from ATT&CK technique names and was NOT tuned after seeing these results.
+
+## Data provenance
+- `data/cti_reports/R01..R08`: **paraphrased summaries written by the project team in their own words** from
+  public reporting on AWS/cloud intrusions (SCARLETEEL x2, LLMjacking, EmeraldWhale, Codefinger, Sisense,
+  Redis/SSH honeypots, Docker Swarm cryptojacking). The source URLs are in each file header. They are not
+  verbatim copies; open the originals to verify facts before quoting them.
+- `data/ground_truth/cti_labels.json`: ATT&CK labels written by one reader from those summaries before the
+  extractor was run. Verify against the originals and have a teammate label independently; report agreement.
+- `tests/fixtures/`: synthetic sample reports used only by unit tests.
+- `S3-02` and `S3-06` are also mapped to T1486 (Data Encrypted for Impact) after the Codefinger report.
+
 ## Honest limitations
-- **The 8 CTI reports are synthetic samples** (fictional actors, reserved-range IPs). Replace them with real
-  public reports in `data/cti_reports/` (header lines `Title/Source/Published/Actors`, blank line, body),
-  re-label `data/ground_truth/cti_labels.json`, and re-run. With only a handful of reports the CTI weight
-  is coarse.
-- Sample-set scores (precision/recall 1.0) only show the code matches the labels the author wrote; they are
-  not evidence of real-world accuracy. Test with your own configs.
+- The labelled set is small (8 reports, 26 labels), so the metrics are indicative only, and CTI weights are
+  coarse (each report moves the weight by 0.125).
+- Reports describe different incidents, not a statistical sample of attacks; the CTI weight is a relevance
+  signal, not an attack probability.
 - Scans static JSON/YAML exports only: no live AWS calls, no Terraform parsing, no auto-remediation.
 - Rules are a CIS-inspired subset and are not mapped to specific CIS benchmark numbers; map them to your
   benchmark version before citing.
 - LLM output is never trusted blindly: technique IDs must be well-formed and backed by an evidence sentence
   found in the report (or the ID must appear in the text), else they are rejected. IOCs always use regexes.
+- The dashboard uses Flask's development server with no login: run it locally only.

@@ -46,35 +46,46 @@
   },
   "extraction": {
     "overall": {
-      "tp": 8,
-      "fp": 0,
-      "fn": 0,
+      "tp": 16,
+      "fp": 2,
+      "fn": 10,
+      "precision": 0.889,
+      "recall": 0.615,
+      "f1": 0.727
+    },
+    "in_scope": {
+      "labelled_techniques": 17,
+      "extracted_techniques": 10,
       "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0
+      "recall": 0.588
     },
     "per_report": {
-      "R1_cloud_credential_theft": {
+      "R01_scarleteel_2023": {
         "tp": 3,
         "fp": 0,
-        "fn": 0,
+        "fn": 2,
         "precision": 1.0,
-        "recall": 1.0,
-        "f1": 1.0,
+        "recall": 0.6,
+        "f1": 0.75,
         "extra": [],
-        "missing": []
+        "missing": [
+          "T1530",
+          "T1552.001"
+        ]
       },
-      "R5_rdp_brute_force": {
-        "tp": 3,
+      "R02_scarleteel_fargate_2023": {
+        "tp": 2,
         "fp": 0,
-        "fn": 0,
+        "fn": 1,
         "precision": 1.0,
-        "recall": 1.0,
-        "f1": 1.0,
+        "recall": 0.667,
+        "f1": 0.8,
         "extra": [],
-        "missing": []
+        "missing": [
+          "T1552"
+        ]
       },
-      "R6_log_tampering": {
+      "R03_llmjacking_2024": {
         "tp": 2,
         "fp": 0,
         "fn": 0,
@@ -83,12 +94,76 @@
         "f1": 1.0,
         "extra": [],
         "missing": []
+      },
+      "R04_emeraldwhale_2024": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "extra": [],
+        "missing": []
+      },
+      "R05_codefinger_2025": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.667,
+        "extra": [],
+        "missing": [
+          "T1078.004"
+        ]
+      },
+      "R06_sisense_2024": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 2,
+        "precision": 1.0,
+        "recall": 0.333,
+        "f1": 0.5,
+        "extra": [],
+        "missing": [
+          "T1078.004",
+          "T1530"
+        ]
+      },
+      "R07_redis_ssh_honeypots_2023": {
+        "tp": 2,
+        "fp": 2,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.667,
+        "f1": 0.571,
+        "extra": [
+          "T1110",
+          "T1498"
+        ],
+        "missing": [
+          "T1110.001"
+        ]
+      },
+      "R08_docker_swarm_cryptojacking_2024": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 3,
+        "precision": 1.0,
+        "recall": 0.4,
+        "f1": 0.571,
+        "extra": [],
+        "missing": [
+          "T1021.004",
+          "T1190",
+          "T1610"
+        ]
       }
     },
     "methods": [
       "offline"
     ],
-    "labelled_reports": 3,
+    "labelled_reports": 8,
     "total_reports": 8,
     "techniques_with_unverified_evidence": 0,
     "llm_outputs_rejected": 0
@@ -96,55 +171,59 @@
   "ranking": {
     "findings": 24,
     "mean_abs_rank_change": 3.25,
-    "top5_overlap": "3/5",
-    "findings_with_cti_support": 24,
+    "top5_overlap": "4/5",
+    "findings_with_cti_support": 18,
     "top_fused": [
-      {
-        "resource": "AdminAll",
-        "check": "IAM-01",
-        "score": 75.0,
-        "priority": "Critical",
-        "baseline_rank": 1,
-        "fused_rank": 1
-      },
-      {
-        "resource": "root-account",
-        "check": "IAM-03",
-        "score": 75.0,
-        "priority": "Critical",
-        "baseline_rank": 2,
-        "fused_rank": 2
-      },
       {
         "resource": "sg-db-01",
         "check": "NET-03",
         "score": 68.8,
         "priority": "Critical",
         "baseline_rank": 4,
+        "fused_rank": 1
+      },
+      {
+        "resource": "AdminAll",
+        "check": "IAM-01",
+        "score": 62.5,
+        "priority": "Critical",
+        "baseline_rank": 1,
+        "fused_rank": 2
+      },
+      {
+        "resource": "root-account",
+        "check": "IAM-03",
+        "score": 62.5,
+        "priority": "Critical",
+        "baseline_rank": 2,
         "fused_rank": 3
       },
       {
         "resource": "customer-data-prod",
         "check": "S3-01",
-        "score": 68.8,
+        "score": 50.0,
         "priority": "Critical",
         "baseline_rank": 6,
         "fused_rank": 4
       },
       {
-        "resource": "root-account",
-        "check": "IAM-04",
-        "score": 52.5,
-        "priority": "Critical",
-        "baseline_rank": 10,
+        "resource": "sg-rdp",
+        "check": "NET-02",
+        "score": 45.8,
+        "priority": "High",
+        "baseline_rank": 3,
         "fused_rank": 5
       }
     ]
   },
   "mapping_coverage": {
     "checks_mapped": 18,
-    "checks_with_cti_support": 18,
-    "unsupported_checks": []
+    "checks_with_cti_support": 15,
+    "unsupported_checks": [
+      "S3-01",
+      "S3-03",
+      "S3-04"
+    ]
   },
   "note": "Sample data only: numbers describe the bundled test set, not real-world accuracy."
 }

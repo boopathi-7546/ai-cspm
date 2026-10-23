@@ -1,0 +1,6 @@
+Title: SCARLETEEL: cloud intrusion from a Kubernetes service into AWS
+Source: Sysdig Threat Research Team (Feb 2023). Paraphrased summary by the project team from public coverage: https://thehackernews.com/2023/03/hackers-exploit-containerized.html
+Published: 2023-02
+Actors: SCARLETEEL
+
+The operation tracked as SCARLETEEL began when the actor exploited a vulnerable public-facing service running in a self-managed Kubernetes cluster hosted on AWS. From that foothold the actor deployed a cryptocurrency miner on the cluster. The actor also went after the cloud account itself and disabled CloudTrail logging to lower the chance of being noticed. In a further step the actor stole Terraform state files from S3 buckets, and those files exposed IAM access keys belonging to a second AWS account.

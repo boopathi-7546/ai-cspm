@@ -1,0 +1,6 @@
+Title: Cloud honeypots: misconfigured Redis cryptojacking and SSH brute force
+Source: Cado Security and Avertium (Mar 2023). Paraphrased summary by the project team from public coverage: https://thehackernews.com/2023/03/new-cryptojacking-campaign-leverages.html
+Published: 2023-03
+Actors: 
+
+Cado Security described a cryptojacking campaign against improperly configured Redis database servers, which used a legitimate command-line file transfer service to host and deliver malicious payloads. The same coverage summarised Avertium honeypot data: 1.2 million unauthorized SSH connection attempts across 18 honeypots between October and December 2022. After scanning found an open port, attackers brute-forced the root account with a list of about 17,000 passwords, and a successful login led to installation of an XorDDoS bot used for DDoS attacks.

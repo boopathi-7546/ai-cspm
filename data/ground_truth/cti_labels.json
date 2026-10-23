@@ -1,17 +1,11 @@
 {
-  "_note": "Manual labels for a SUBSET of reports. Re-label against your own real reports.",
-  "R1_cloud_credential_theft": [
-    "T1552.001",
-    "T1078.004",
-    "T1530"
-  ],
-  "R5_rdp_brute_force": [
-    "T1110",
-    "T1021.001",
-    "T1133"
-  ],
-  "R6_log_tampering": [
-    "T1562.008",
-    "T1078.004"
-  ]
+  "_note": "Labels written by the project assistant from the 8 paraphrased summaries in data/cti_reports, BEFORE running the extractor. They are one reader's judgement: verify each against the original report (URL in each file header) and have a teammate label independently.",
+  "R01_scarleteel_2023": ["T1190", "T1496", "T1562.008", "T1530", "T1552.001"],
+  "R02_scarleteel_fargate_2023": ["T1552", "T1496", "T1498"],
+  "R03_llmjacking_2024": ["T1190", "T1078.004"],
+  "R04_emeraldwhale_2024": ["T1595", "T1552.001", "T1078.004"],
+  "R05_codefinger_2025": ["T1078.004", "T1486"],
+  "R06_sisense_2024": ["T1552.001", "T1078.004", "T1530"],
+  "R07_redis_ssh_honeypots_2023": ["T1190", "T1496", "T1110.001"],
+  "R08_docker_swarm_cryptojacking_2024": ["T1190", "T1595", "T1610", "T1496", "T1021.004"]
 }

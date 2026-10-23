@@ -26,23 +26,42 @@ ACTOR_RE = re.compile(r"(?:actor|group|operators?|attacker)s?\s+(?:known as|call
 
 # Plain-language phrases -> technique, used when a report names no T-codes.
 KEYWORD_MAP: list[tuple[str, str]] = [
-    ("stolen credentials", "T1078.004"),
-    ("compromised credentials", "T1078.004"),
-    ("valid cloud account", "T1078.004"),
-    ("credential files", "T1552.001"),
-    ("publicly accessible bucket", "T1530"),
-    ("exposed storage bucket", "T1530"),
-    ("data from cloud storage", "T1530"),
-    ("public-facing application", "T1190"),
-    ("exposed docker api", "T1190"),
-    ("brute force", "T1110"),
-    ("remote desktop port", "T1021.001"),
-    ("external remote service", "T1133"),
-    ("disabled cloudtrail", "T1562.008"),
-    ("disable cloudtrail", "T1562.008"),
+    # Valid Accounts: Cloud Accounts
+    ("valid accounts", "T1078.004"), ("valid cloud account", "T1078.004"),
+    ("stolen credentials", "T1078.004"), ("compromised credentials", "T1078.004"),
+    ("stolen cloud credentials", "T1078.004"), ("compromised aws keys", "T1078.004"),
+    ("stolen aws keys", "T1078.004"), ("compromised access keys", "T1078.004"),
+    ("stolen access keys", "T1078.004"), ("compromised account", "T1078.004"),
+    # Unsecured Credentials
+    ("unsecured credentials", "T1552"), ("credentials in files", "T1552.001"),
+    ("credential files", "T1552.001"), ("hardcoded credentials", "T1552.001"),
+    ("credentials embedded", "T1552.001"), ("credential stored in", "T1552.001"),
+    ("credentials stored in", "T1552.001"), ("git configuration files", "T1552.001"),
+    ("environment files", "T1552.001"), ("instance metadata", "T1552.005"),
+    # Data from Cloud Storage
+    ("data from cloud storage", "T1530"), ("publicly accessible bucket", "T1530"),
+    ("exposed storage bucket", "T1530"), ("copied out of s3", "T1530"),
+    # Exploit Public-Facing Application / external remote services
+    ("public-facing", "T1190"), ("exposed docker api", "T1190"), ("vulnerable version of", "T1190"),
+    ("exploited a vulnerable", "T1190"), ("exploiting a vulnerable", "T1190"),
+    ("misconfigured redis", "T1190"), ("improperly configured redis", "T1190"),
+    ("external remote service", "T1133"), ("remote desktop port", "T1021.001"),
+    # Brute force
+    ("brute force", "T1110"), ("brute-force", "T1110"), ("brute forced", "T1110"),
+    ("password spray", "T1110.003"), ("password guessing", "T1110.001"),
+    # Defense evasion / impact
+    ("disabled cloudtrail", "T1562.008"), ("disable cloudtrail", "T1562.008"),
+    ("turned off cloudtrail", "T1562.008"), ("disabling cloudtrail", "T1562.008"),
+    ("data destruction", "T1485"), ("deleted objects", "T1485"), ("deleted backups", "T1485"),
     ("deleted objects and backups", "T1485"),
-    ("cryptocurrency miner", "T1496"),
-    ("phishing", "T1566"),
+    ("encrypts the objects", "T1486"), ("encrypt s3", "T1486"), ("encrypted the data", "T1486"),
+    ("demands a ransom", "T1486"), ("data encrypted for impact", "T1486"),
+    ("cryptocurrency miner", "T1496"), ("crypto miner", "T1496"), ("cryptominer", "T1496"),
+    ("cryptomining", "T1496"), ("cryptojacking", "T1496"), ("resource hijacking", "T1496"),
+    ("ddos", "T1498"),
+    # Initial access / recon
+    ("phishing", "T1566"), ("scanned the internet", "T1595"), ("scanning the internet", "T1595"),
+    ("internet scanning", "T1595"),
 ]
 
 

@@ -1,10 +1,10 @@
-from cspm.config import CTI_DIR
+from conftest import SAMPLE_REPORTS
 from cspm.cti_extractor import (extract_iocs, extract_offline, extract_report, parse_report,
                                 validate_llm_payload)
 
 
 def rep(name):
-    return parse_report(CTI_DIR / f"{name}.txt")
+    return parse_report(SAMPLE_REPORTS / f"{name}.txt")
 
 
 def ids(res):

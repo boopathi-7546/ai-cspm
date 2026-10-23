@@ -1,0 +1,6 @@
+Title: SCARLETEEL returns: Fargate targeting and stealthier credential theft
+Source: Sysdig (Jul 2023). Paraphrased summary by the project team from public coverage: https://thehackernews.com/2023/07/scarleteel-cryptojacking-campaign.html and https://techrepublic.com/article/scarletee-targets-aws-fargate-ddos-cryptojacking
+Published: 2023-07
+Actors: SCARLETEEL
+
+A follow-up campaign by the group tracked as SCARLETEEL widened its reach to AWS Fargate environments. The operators used shell scripts to harvest AWS credentials from the compromised workloads. Their data theft was arranged so that the exfiltration was not recorded in CloudTrail, which made detection harder. The campaign continued the group's cryptomining activity, and the same coverage reported DDoS activity as well.

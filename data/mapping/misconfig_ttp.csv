@@ -11,10 +11,12 @@ IAM-08,T1110,Brute Force,Short passwords are cheaper to guess
 S3-01,T1530,Data from Cloud Storage,Public read lets anyone download objects
 S3-02,T1530,Data from Cloud Storage,Public write exposes the bucket to tampering and abuse
 S3-02,T1485,Data Destruction,Public write allows deletion or overwrite of objects
+S3-02,T1486,Data Encrypted for Impact,Public write allows objects to be overwritten or encrypted
 S3-03,T1530,Data from Cloud Storage,Without Block Public Access a later policy change can expose data
 S3-04,T1530,Data from Cloud Storage,Unencrypted data is easier to use once the bucket is reached
 S3-05,T1562.008,Impair Defenses: Disable or Modify Cloud Logs,Missing access logs hide data access from defenders
 S3-06,T1485,Data Destruction,Without versioning deleted or overwritten objects cannot be restored
+S3-06,T1486,Data Encrypted for Impact,Without versioning objects encrypted by ransomware cannot be rolled back
 NET-01,T1190,Exploit Public-Facing Application,Internet-reachable SSH is a direct attack surface
 NET-01,T1133,External Remote Services,SSH is a remote access service
 NET-02,T1190,Exploit Public-Facing Application,Internet-reachable RDP is a direct attack surface

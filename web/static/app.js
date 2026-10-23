@@ -223,7 +223,8 @@ async function renderEval() {
   clear(body).append(el("div", { class: "evalgrid" }, [
     evalCard("Misconfiguration detection", [`Precision ${d.overall.precision}`, `Recall ${d.overall.recall}`, `F1 ${d.overall.f1}`,
       `False-positive resource rate ${d.false_positive_resource_rate}`, `Clean resources checked: ${d.clean_resources}`]),
-    evalCard("CTI extraction (labelled subset)", [`Precision ${e.overall.precision}`, `Recall ${e.overall.recall}`,
+    evalCard("CTI extraction (all labelled techniques)", [`Precision ${e.overall.precision}`, `Recall ${e.overall.recall}`,
+      `In-scope for risk score: precision ${e.in_scope.precision}, recall ${e.in_scope.recall}`,
       `Labelled reports ${e.labelled_reports} of ${e.total_reports}`, `Method: ${e.methods.join(", ")}`,
       `LLM outputs rejected: ${e.llm_outputs_rejected}`]),
     evalCard("Ranking: severity-only vs fused", [`Findings ${k.findings}`, `Mean rank change ${k.mean_abs_rank_change}`,

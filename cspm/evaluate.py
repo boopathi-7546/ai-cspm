@@ -11,7 +11,7 @@ from pathlib import Path
 from .config import CONFIG_DIR, GROUND_TRUTH_DIR, RESULTS_DIR
 from .evidence import build_evidence_index, supporting_reports
 from .fusion import score_findings
-from .mapping import load_mapping
+from .mapping import load_mapping, related
 from .scanner import list_resources, load_config, scan_config
 
 
@@ -45,10 +45,18 @@ def evaluate_detection(config_dir: Path = CONFIG_DIR) -> dict:
             "false_positive_resource_rate": round(clean_flagged / clean_total, 3) if clean_total else 0.0}
 
 
-def evaluate_extraction(cti: list[dict]) -> dict:
-    labels = json.loads((GROUND_TRUTH_DIR / "cti_labels.json").read_text())
+def _in_scope(tid: str, scope: set[str]) -> bool:
+    return any(related(tid, m) for m in scope)
+
+
+def evaluate_extraction(cti: list[dict], labels_path: Path | None = None) -> dict:
+    """Exact-ID metrics over ALL labelled techniques, plus 'in-scope' metrics restricted to techniques
+    that the misconfiguration mapping can use (matched with parent/child relatedness, as fusion does)."""
+    labels = json.loads(Path(labels_path or GROUND_TRUTH_DIR / "cti_labels.json").read_text())
+    scope = {m["technique_id"] for ms in load_mapping().values() for m in ms}
     by_id = {r["report_id"]: r for r in cti}
     TP = FP = FN = 0
+    sc_truth = sc_got = sc_truth_hit = sc_got_hit = 0
     per_report = {}
     for rid, truth in labels.items():
         if rid.startswith("_") or rid not in by_id:
@@ -58,10 +66,19 @@ def evaluate_extraction(cti: list[dict]) -> dict:
         tp, fp, fn = len(got & tru), len(got - tru), len(tru - got)
         per_report[rid] = {**_prf(tp, fp, fn), "extra": sorted(got - tru), "missing": sorted(tru - got)}
         TP, FP, FN = TP + tp, FP + fp, FN + fn
+        g = {x for x in got if _in_scope(x, scope)}
+        t_ = {x for x in tru if _in_scope(x, scope)}
+        sc_truth += len(t_)
+        sc_got += len(g)
+        sc_truth_hit += sum(1 for x in t_ if any(related(x, y) for y in g))
+        sc_got_hit += sum(1 for y in g if any(related(y, x) for x in t_))
     methods = sorted({r["method"] for r in cti})
     unverified = sum(1 for r in cti for t in r["techniques"] if not t["evidence_verified"])
     rejected = sum(len(r.get("rejected", [])) for r in cti)
-    return {"overall": _prf(TP, FP, FN), "per_report": per_report, "methods": methods,
+    in_scope = {"labelled_techniques": sc_truth, "extracted_techniques": sc_got,
+                "precision": round(sc_got_hit / sc_got, 3) if sc_got else 1.0,
+                "recall": round(sc_truth_hit / sc_truth, 3) if sc_truth else 1.0}
+    return {"overall": _prf(TP, FP, FN), "in_scope": in_scope, "per_report": per_report, "methods": methods,
             "labelled_reports": len(per_report), "total_reports": len(cti),
             "techniques_with_unverified_evidence": unverified, "llm_outputs_rejected": rejected}
 

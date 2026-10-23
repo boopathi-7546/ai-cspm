@@ -1,0 +1,6 @@
+Title: LLMjacking: stolen cloud credentials used against hosted LLM services
+Source: Sysdig Threat Research Team (May 2024). Paraphrased summary by the project team from: https://sysdig.com/?p=88386 and https://thehackernews.com/2024/05/researchers-uncover-llmjacking-scheme.html
+Published: 2024-05
+Actors: 
+
+Sysdig described an attack it named LLMjacking, in which stolen cloud credentials are used against cloud-hosted large language model services. The intrusion started with a system running a vulnerable version of the Laravel framework (CVE-2021-3129). The attackers exfiltrated the cloud credentials from that system and used them to enter the victim's cloud environment. They ran a script to validate the keys against ten AI services, probed what the stolen credentials were allowed to do, and queried the account's logging settings, likely to avoid detection. A reverse proxy was used to resell access to the compromised accounts, and Sysdig estimated the victim's usage costs could exceed 46,000 dollars per day.

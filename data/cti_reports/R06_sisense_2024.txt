@@ -1,0 +1,6 @@
+Title: Sisense breach: repository credential leads to customer data in S3
+Source: Krebs on Security (Apr 2024), with CISA alert. Paraphrased summary by the project team from: https://krebsonsecurity.com/2024/04/why-cisa-is-warning-cisos-about-a-breach-at-sisense/
+Published: 2024-04
+Actors: 
+
+According to reporting based on sources close to the investigation, attackers obtained a credential stored in the company's GitLab code repository. That credential gave them access to Sisense's Amazon S3 buckets, from which several terabytes of customer data were copied out. CISA urged affected customers to reset credentials and secrets they had shared with the vendor.

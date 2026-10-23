@@ -1,0 +1,6 @@
+Title: Codefinger: S3 ransomware using compromised AWS keys and SSE-C
+Source: Halcyon (Jan 2025). Paraphrased summary by the project team from public coverage: https://www.bleepingcomputer.com/news/security/ransomware-abuses-amazon-aws-feature-to-encrypt-s3-buckets/
+Published: 2025-01
+Actors: Codefinger
+
+Halcyon reported ransomware activity by the actor tracked as Codefinger that targets Amazon S3 data. The actor uses compromised or publicly exposed AWS keys and looks for keys allowed to read and write S3 objects. With such a key the actor encrypts the objects using the S3 server-side encryption with customer-provided keys feature and an AES-256 key generated and kept by the attacker, then demands a ransom for the key. No AWS vulnerability is exploited. Recovery without the attacker's key is not possible, and CloudTrail records too little to support forensics. Halcyon observed at least two victims.
