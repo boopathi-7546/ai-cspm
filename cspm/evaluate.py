@@ -110,7 +110,7 @@ def evaluate_mapping_coverage(cti: list[dict]) -> dict:
 def run_evaluation(cti: list[dict], out_dir: Path = RESULTS_DIR, write: bool = True) -> dict:
     result = {"detection": evaluate_detection(), "extraction": evaluate_extraction(cti),
               "ranking": evaluate_ranking(cti), "mapping_coverage": evaluate_mapping_coverage(cti),
-              "note": "Sample data only: numbers describe the bundled test set, not real-world accuracy."}
+              "note": "Detection numbers come from 3 hand-made sample configs. CTI numbers come from 8 paraphrased public reports labelled by one reader. Both sets are small, so treat the results as indicative only."}
     if write:
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
