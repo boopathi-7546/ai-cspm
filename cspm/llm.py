@@ -70,14 +70,37 @@ def complete(client, system: str, user: str, max_tokens: int = 1500) -> str:
         if not model:
             raise ValueError("CTI_LLM_MODEL must be set for Gemini (e.g. gemini-2.0-flash)")
 
+        # Thinking tokens count toward max_output_tokens, so use at least 256 for checks and 4096 for extraction
+        if max_tokens <= 256:
+            gemini_tokens = max(max_tokens, 256)
+        else:
+            gemini_tokens = max(max_tokens, 4096)
+
+        thinking_config = None
+        if "flash" in model.lower():
+            try:
+                from google.genai import types as genai_types
+                if hasattr(genai_types, "ThinkingConfig"):
+                    thinking_config = genai_types.ThinkingConfig(thinking_budget=0)
+            except Exception:
+                thinking_config = {"thinking_budget": 0}
+
         try:
             from google.genai import types as genai_types
-            config = genai_types.GenerateContentConfig(
-                system_instruction=system,
-                max_output_tokens=max_tokens,
-            )
+            config_kwargs = {
+                "system_instruction": system,
+                "max_output_tokens": gemini_tokens,
+            }
+            if thinking_config is not None:
+                config_kwargs["thinking_config"] = thinking_config
+            config = genai_types.GenerateContentConfig(**config_kwargs)
         except Exception:
-            config = {"system_instruction": system, "max_output_tokens": max_tokens}
+            config = {
+                "system_instruction": system,
+                "max_output_tokens": gemini_tokens,
+            }
+            if thinking_config is not None:
+                config["thinking_config"] = thinking_config
 
         retries = 2
         try:

@@ -181,3 +181,33 @@ def test_llm_check_anthropic_default(monkeypatch, capsys):
     assert "anthropic" in out
 
 
+def test_gemini_token_floors_and_flash_thinking_budget(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("CTI_LLM_MODEL", "gemini-2.0-flash")
+
+    client = FakeGeminiClient("OK")
+    # Small check floor (at least 256)
+    complete(client, system="sys", user="ping", max_tokens=10)
+    cfg1 = client.captured_calls[-1]["config"]
+    assert cfg1.max_output_tokens == 256
+    assert cfg1.thinking_config.thinking_budget == 0
+
+    # Extraction floor (at least 4096)
+    complete(client, system="sys", user="ping", max_tokens=1500)
+    cfg2 = client.captured_calls[-1]["config"]
+    assert cfg2.max_output_tokens == 4096
+    assert cfg2.thinking_config.thinking_budget == 0
+
+
+def test_gemini_non_flash_model_no_thinking_budget_override(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("CTI_LLM_MODEL", "gemini-1.5-pro")
+
+    client = FakeGeminiClient("OK")
+    complete(client, system="sys", user="ping", max_tokens=10)
+    cfg = client.captured_calls[-1]["config"]
+    assert cfg.max_output_tokens == 256
+    assert cfg.thinking_config is None
+
+
+

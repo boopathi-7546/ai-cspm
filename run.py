@@ -71,7 +71,8 @@ def main() -> int:
             return 1
 
         try:
-            reply = complete(client, "Reply with the single word OK.", "ping", max_tokens=10)
+            tok = 256 if provider == "gemini" else 10
+            reply = complete(client, "Reply with the single word OK.", "ping", max_tokens=tok)
         except Exception as exc:  # report the problem, never the key
             err_msg = str(exc)[:200]
             for key in (os.getenv("GEMINI_API_KEY"), os.getenv("ANTHROPIC_API_KEY")):
