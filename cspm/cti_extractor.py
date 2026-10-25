@@ -219,7 +219,8 @@ def extract_report(report: dict, client=None) -> dict:
             return extract_llm(report, client)
         except Exception as exc:  # network error, bad JSON, quota ... -> fall back safely
             res = extract_offline(report, method="offline (llm fallback)")
-            res["rejected"].append(f"llm failed: {type(exc).__name__}")
+            from .llm import format_llm_error
+            res["rejected"].append(format_llm_error(exc))
             return res
     return extract_offline(report)
 

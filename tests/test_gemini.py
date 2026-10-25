@@ -223,5 +223,64 @@ def test_gemini_3_flash_thinking_level(monkeypatch):
     assert str(cfg.thinking_config.thinking_level).upper().endswith("LOW")
 
 
+def test_format_llm_error_details(monkeypatch):
+    from cspm.llm import format_llm_error
+
+    monkeypatch.setenv("GEMINI_API_KEY", "dummy-secret-gemini-key-123456")
+
+    class FakeHttpError(Exception):
+        def __init__(self):
+            self.code = 503
+            # Message contains a key and exceeds 120 characters
+            super().__init__(
+                "503 Service Unavailable: dummy-secret-gemini-key-123456 failed while calling "
+                "service endpoint with extra verbose backend diagnostic payload "
+                "that exceeds one hundred and twenty characters easily"
+            )
+
+    err = format_llm_error(FakeHttpError())
+    assert "llm failed: FakeHttpError (503):" in err
+    assert "dummy-secret-gemini-key-123456" not in err
+    assert "[REDACTED]" in err
+    # Ensure message part after 'FakeHttpError (503): ' is <= 120 chars
+    msg_part = err.split("FakeHttpError (503): ", 1)[1]
+    assert len(msg_part) <= 120
+
+
+def test_extract_report_stores_status_and_message_in_rejected(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("CTI_LLM_MODEL", "gemini-2.0-flash")
+    monkeypatch.setenv("CSPM_RETRY_BACKOFF", "0.001")
+
+    class Status429Client:
+        class models:
+            @staticmethod
+            def generate_content(*args, **kwargs):
+                err = Exception("429 Quota limit 0 reached for current project")
+                err.status_code = 429
+                raise err
+
+    res = extract_report(rep("R3_exposed_services"), client=Status429Client())
+    assert res["method"].startswith("offline (llm fallback)")
+    assert any("429" in r and "Exception" in r and "Quota limit" in r for r in res["rejected"])
+
+
+def test_llm_delay_seconds(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("CTI_LLM_MODEL", "gemini-2.0-flash")
+    monkeypatch.setenv("CTI_LLM_DELAY_SECONDS", "0.05")
+
+    client = FakeGeminiClient("OK")
+    slept = []
+
+    import time
+    orig_sleep = time.sleep
+    monkeypatch.setattr(time, "sleep", lambda s: slept.append(s))
+
+    complete(client, system="sys", user="ping")
+    assert slept == [0.05]
+
+
+
 
 
