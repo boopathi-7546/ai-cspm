@@ -1,0 +1,238 @@
+{
+  "detection": {
+    "overall": {
+      "tp": 30,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "per_config": {
+      "vulnerable_env": {
+        "tp": 24,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positives": [],
+        "missed": []
+      },
+      "secure_env": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positives": [],
+        "missed": []
+      },
+      "ambiguous_env": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positives": [],
+        "missed": []
+      },
+      "workload_env": {
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positives": [],
+        "missed": []
+      }
+    },
+    "clean_resources": 20,
+    "clean_resources_flagged": 0,
+    "false_positive_resource_rate": 0.0
+  },
+  "extraction": {
+    "overall": {
+      "tp": 22,
+      "fp": 11,
+      "fn": 4,
+      "precision": 0.667,
+      "recall": 0.846,
+      "f1": 0.746
+    },
+    "in_scope": {
+      "labelled_techniques": 18,
+      "extracted_techniques": 17,
+      "precision": 0.882,
+      "recall": 0.833
+    },
+    "per_report": {
+      "R01_scarleteel_2023": {
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "extra": [],
+        "missing": []
+      },
+      "R02_scarleteel_fargate_2023": {
+        "tp": 3,
+        "fp": 2,
+        "fn": 0,
+        "precision": 0.6,
+        "recall": 1.0,
+        "f1": 0.75,
+        "extra": [
+          "T1059.004",
+          "T1562.008"
+        ],
+        "missing": []
+      },
+      "R03_llmjacking_2024": {
+        "tp": 2,
+        "fp": 3,
+        "fn": 0,
+        "precision": 0.4,
+        "recall": 1.0,
+        "f1": 0.571,
+        "extra": [
+          "T1069.003",
+          "T1496",
+          "T1526"
+        ],
+        "missing": []
+      },
+      "R04_emeraldwhale_2024": {
+        "tp": 3,
+        "fp": 2,
+        "fn": 0,
+        "precision": 0.6,
+        "recall": 1.0,
+        "f1": 0.75,
+        "extra": [
+          "T1213.003",
+          "T1530"
+        ],
+        "missing": []
+      },
+      "R05_codefinger_2025": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "extra": [],
+        "missing": []
+      },
+      "R06_sisense_2024": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "extra": [],
+        "missing": []
+      },
+      "R07_redis_ssh_honeypots_2023": {
+        "tp": 2,
+        "fp": 4,
+        "fn": 1,
+        "precision": 0.333,
+        "recall": 0.667,
+        "f1": 0.444,
+        "extra": [
+          "T1021.004",
+          "T1046",
+          "T1105",
+          "T1498"
+        ],
+        "missing": [
+          "T1190"
+        ]
+      },
+      "R08_docker_swarm_cryptojacking_2024": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 3,
+        "precision": 1.0,
+        "recall": 0.4,
+        "f1": 0.571,
+        "extra": [],
+        "missing": [
+          "T1021.004",
+          "T1190",
+          "T1610"
+        ]
+      }
+    },
+    "methods": [
+      "llm",
+      "offline (llm fallback)"
+    ],
+    "labelled_reports": 8,
+    "total_reports": 8,
+    "techniques_with_unverified_evidence": 0,
+    "llm_outputs_rejected": 1
+  },
+  "ranking": {
+    "findings": 24,
+    "mean_abs_rank_change": 3.33,
+    "top5_overlap": "3/5",
+    "findings_with_cti_support": 24,
+    "top_fused": [
+      {
+        "resource": "AdminAll",
+        "check": "IAM-01",
+        "score": 75.0,
+        "priority": "Critical",
+        "baseline_rank": 1,
+        "fused_rank": 1
+      },
+      {
+        "resource": "root-account",
+        "check": "IAM-03",
+        "score": 75.0,
+        "priority": "Critical",
+        "baseline_rank": 2,
+        "fused_rank": 2
+      },
+      {
+        "resource": "customer-data-prod",
+        "check": "S3-01",
+        "score": 68.8,
+        "priority": "Critical",
+        "baseline_rank": 6,
+        "fused_rank": 3
+      },
+      {
+        "resource": "sg-db-01",
+        "check": "NET-03",
+        "score": 62.5,
+        "priority": "Critical",
+        "baseline_rank": 4,
+        "fused_rank": 4
+      },
+      {
+        "resource": "root-account",
+        "check": "IAM-04",
+        "score": 52.5,
+        "priority": "Critical",
+        "baseline_rank": 10,
+        "fused_rank": 5
+      }
+    ]
+  },
+  "mapping_coverage": {
+    "checks_mapped": 22,
+    "checks_with_cti_support": 22,
+    "unsupported_checks": []
+  },
+  "note": "Detection numbers come from 4 hand-made sample configs. CTI numbers come from 8 paraphrased public reports labelled by one reader. Both sets are small, so treat the results as indicative only."
+}
