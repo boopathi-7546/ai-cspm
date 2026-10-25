@@ -170,7 +170,9 @@ def test_llm_check_gemini_missing_key(monkeypatch, capsys):
 
 def test_llm_check_anthropic_default(monkeypatch, capsys):
     monkeypatch.setenv("LLM_PROVIDER", "anthropic")
+    monkeypatch.delenv("CTI_LLM_MODEL", raising=False)
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setattr("cspm.config.LLM_MODEL", "claude-sonnet-5-5")
     monkeypatch.setattr("sys.argv", ["run.py", "llm-check"])
     import run
     ret = run.main()
@@ -208,6 +210,18 @@ def test_gemini_non_flash_model_no_thinking_budget_override(monkeypatch):
     cfg = client.captured_calls[-1]["config"]
     assert cfg.max_output_tokens == 256
     assert cfg.thinking_config is None
+
+
+def test_gemini_3_flash_thinking_level(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("CTI_LLM_MODEL", "gemini-3.8-flash")
+
+    client = FakeGeminiClient("OK")
+    complete(client, system="sys", user="ping", max_tokens=10)
+    cfg = client.captured_calls[-1]["config"]
+    assert cfg.max_output_tokens == 256
+    assert str(cfg.thinking_config.thinking_level).upper().endswith("LOW")
+
 
 
 

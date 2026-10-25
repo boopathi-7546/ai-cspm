@@ -81,26 +81,36 @@ def complete(client, system: str, user: str, max_tokens: int = 1500) -> str:
             try:
                 from google.genai import types as genai_types
                 if hasattr(genai_types, "ThinkingConfig"):
-                    thinking_config = genai_types.ThinkingConfig(thinking_budget=0)
+                    if "3." in model or model.startswith("gemini-3") or "-3-" in model:
+                        thinking_config = genai_types.ThinkingConfig(thinking_level="low")
+                    else:
+                        thinking_config = genai_types.ThinkingConfig(thinking_budget=0)
             except Exception:
-                thinking_config = {"thinking_budget": 0}
+                if "3." in model or model.startswith("gemini-3") or "-3-" in model:
+                    thinking_config = {"thinking_level": "low"}
+                else:
+                    thinking_config = {"thinking_budget": 0}
 
-        try:
-            from google.genai import types as genai_types
-            config_kwargs = {
-                "system_instruction": system,
-                "max_output_tokens": gemini_tokens,
-            }
-            if thinking_config is not None:
-                config_kwargs["thinking_config"] = thinking_config
-            config = genai_types.GenerateContentConfig(**config_kwargs)
-        except Exception:
-            config = {
-                "system_instruction": system,
-                "max_output_tokens": gemini_tokens,
-            }
-            if thinking_config is not None:
-                config["thinking_config"] = thinking_config
+        def _make_config(tc):
+            try:
+                from google.genai import types as genai_types
+                config_kwargs = {
+                    "system_instruction": system,
+                    "max_output_tokens": gemini_tokens,
+                }
+                if tc is not None:
+                    config_kwargs["thinking_config"] = tc
+                return genai_types.GenerateContentConfig(**config_kwargs)
+            except Exception:
+                cfg = {
+                    "system_instruction": system,
+                    "max_output_tokens": gemini_tokens,
+                }
+                if tc is not None:
+                    cfg["thinking_config"] = tc
+                return cfg
+
+        config = _make_config(thinking_config)
 
         retries = 2
         try:
@@ -121,6 +131,11 @@ def complete(client, system: str, user: str, max_tokens: int = 1500) -> str:
                     return response
                 return str(response)
             except Exception as exc:
+                # If thinking_config is unsupported by this specific model, retry without it
+                if thinking_config is not None and ("thinking" in str(exc).lower() or "invalid_argument" in str(exc).lower()):
+                    thinking_config = None
+                    config = _make_config(None)
+                    continue
                 if attempt < retries and _is_rate_limit(exc):
                     time.sleep(base_backoff * (2 ** attempt))
                     continue
