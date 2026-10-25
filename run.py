@@ -10,6 +10,7 @@
 """
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -51,19 +52,38 @@ def main() -> int:
 
     if args.cmd == "llm-check":
         from cspm.config import LLM_MODEL
-        from cspm.llm import complete, get_client
+        from cspm.llm import complete, get_client, get_provider
+        provider = get_provider()
+        model = os.getenv("CTI_LLM_MODEL", "").strip() or (LLM_MODEL if provider == "anthropic" else "")
+
+        if provider == "gemini" and not model:
+            print(f"Provider: {provider} | Model: (not set)")
+            print("No model set: for Gemini, CTI_LLM_MODEL must be set (e.g. gemini-2.0-flash).")
+            return 1
+
         client = get_client()
         if client is None:
-            print("No LLM client: set ANTHROPIC_API_KEY (environment variable or .env file) and run "
-                  "`pip install anthropic`. The key itself is never printed.")
+            key_var = "GEMINI_API_KEY" if provider == "gemini" else "ANTHROPIC_API_KEY"
+            pkg = "google-genai" if provider == "gemini" else "anthropic"
+            print(f"Provider: {provider} | Model: {model or '(none)'}")
+            print(f"No LLM client: set {key_var} (environment variable or .env file) and run "
+                  f"`pip install {pkg}`. The key itself is never printed.")
             return 1
+
         try:
             reply = complete(client, "Reply with the single word OK.", "ping", max_tokens=10)
         except Exception as exc:  # report the problem, never the key
-            print(f"LLM call failed with model '{LLM_MODEL}': {type(exc).__name__}: {str(exc)[:200]}")
+            err_msg = str(exc)[:200]
+            for key in (os.getenv("GEMINI_API_KEY"), os.getenv("ANTHROPIC_API_KEY")):
+                if key and len(key) >= 6:
+                    err_msg = err_msg.replace(key, "[REDACTED]")
+            print(f"Provider: {provider} | Model: {model}")
+            print(f"LLM call failed with model '{model}': {type(exc).__name__}: {err_msg}")
             print("If the model name is wrong, set CTI_LLM_MODEL to a valid model.")
             return 1
-        print(f"LLM OK with model '{LLM_MODEL}': {reply.strip()[:40]!r}")
+
+        print(f"Provider: {provider} | Model: {model}")
+        print(f"LLM OK with model '{model}': {reply.strip()[:40]!r}")
         return 0
 
     if args.cmd == "extract":

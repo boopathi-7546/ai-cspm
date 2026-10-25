@@ -17,7 +17,8 @@ RESULTS_DIR = ROOT / "results"
 DB_PATH = Path(os.getenv("CSPM_DB", ROOT / "cspm.db"))
 
 # LLM used for CTI extraction / explanation (optional). Override with CTI_LLM_MODEL.
-LLM_MODEL = os.getenv("CTI_LLM_MODEL", "claude-sonnet-5-5")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic").strip().lower()
+LLM_MODEL = os.getenv("CTI_LLM_MODEL", "" if LLM_PROVIDER == "gemini" else "claude-sonnet-5-5").strip()
 
 # ---- Risk fusion -----------------------------------------------------------
 # Risk = Severity x AssetCriticality x (1 + CTI relevance weight)

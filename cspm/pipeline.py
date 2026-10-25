@@ -19,7 +19,11 @@ def get_cti(refresh: bool = False, use_llm: bool = False, cti_dir: Path = CTI_DI
     if refresh or not Path(EXTRACTED_JSON).exists():
         client = get_client() if use_llm else None
         if use_llm and client is None:
-            print("[warn] --llm requested but ANTHROPIC_API_KEY / anthropic SDK not available; using offline extractor")
+            from .llm import get_provider
+            prov = get_provider()
+            key_name = "GEMINI_API_KEY" if prov == "gemini" else "ANTHROPIC_API_KEY"
+            sdk_name = "google-genai" if prov == "gemini" else "anthropic"
+            print(f"[warn] --llm requested but {key_name} / {sdk_name} SDK not available; using offline extractor")
         return extract_corpus(cti_dir, client=client, out_json=EXTRACTED_JSON)
     return load_extracted()
 

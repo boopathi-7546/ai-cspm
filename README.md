@@ -23,10 +23,13 @@ Optional LLM extraction (otherwise a regex/keyword extractor is used):
 ```
 copy .env.example .env        (Windows; use cp on Linux/macOS)
 ```
-Open `.env` in an editor and put your key after `ANTHROPIC_API_KEY=` (no quotes needed). The project loads
-`.env` automatically; a real environment variable, if set, takes priority. `.env` is git-ignored: never commit it.
+Open `.env` in an editor to configure your preferred LLM provider:
+- **Anthropic (default)**: Set `ANTHROPIC_API_KEY=your_key`. Default model is `claude-sonnet-5-5`.
+- **Google Gemini**: Set `LLM_PROVIDER=gemini`, `GEMINI_API_KEY=your_key`, and specify `CTI_LLM_MODEL=gemini-2.0-flash` (or your chosen Gemini model; there is no default model for Gemini).
+
+The project loads `.env` automatically; a real environment variable, if set, takes priority. `.env` is git-ignored: never commit it.
 ```
-python run.py llm-check       # verifies key, SDK and model name with one tiny request (never prints the key)
+python run.py llm-check       # verifies provider, key, SDK and model name with one tiny request (never prints the key)
 python run.py extract --llm   # re-extract CTI with the LLM (output is validated, see limitations)
 python run.py scan --llm-explain
 ```
@@ -77,7 +80,7 @@ CTI extraction precision/recall on a labelled subset, and baseline (severity-onl
 
 The last row is a real limitation, not a bug (EC2-01 has the same problem: the extractor missed T1552): reports R01 and R06 do describe theft from S3, but the offline
 keyword extractor does not recognise that wording, so public-bucket findings lose their CTI boost. Run
-`python run.py extract --llm` (needs `ANTHROPIC_API_KEY`; this path could not be tested without a key) and
+`python run.py extract --llm` (needs `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`; this path could not be tested without a key) and
 compare. "Offline vs LLM extraction" is a good experiment for your report. The keyword map in
 `cspm/cti_extractor.py` was written from ATT&CK technique names and was NOT tuned after seeing these results.
 
