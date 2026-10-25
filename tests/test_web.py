@@ -35,8 +35,8 @@ def test_empty_state(client):
 def test_demo_scan_then_read_back(client):
     r = client.post("/api/scan/demo")
     runs = r.get_json()["runs"]
-    assert set(runs) == {"vulnerable_env", "secure_env", "ambiguous_env"}
-    assert len(client.get("/api/runs").get_json()) == 3
+    assert set(runs) == {"vulnerable_env", "secure_env", "ambiguous_env", "workload_env"}
+    assert len(client.get("/api/runs").get_json()) == 4
     d = client.get(f"/api/runs/{runs['vulnerable_env']}").get_json()
     assert d["summary"]["total"] == 24 and d["summary"]["total_reports"] == 8
     assert sum(d["summary"]["by_priority"].values()) == 24
@@ -84,3 +84,9 @@ def test_hostile_resource_names_stay_data(client):
 def test_evaluation_endpoint(client):
     r = client.get("/api/evaluation").get_json()
     assert r["detection"]["overall"]["recall"] == 1.0 and "note" in r
+
+
+def test_remediation_served_by_api(client):
+    runs = client.post("/api/scan/demo").get_json()["runs"]
+    d = client.get(f"/api/runs/{runs['vulnerable_env']}").get_json()
+    assert all(f["remediation"] for f in d["findings"])

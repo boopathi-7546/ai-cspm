@@ -23,3 +23,9 @@ NET-02,T1190,Exploit Public-Facing Application,Internet-reachable RDP is a direc
 NET-02,T1021.001,Remote Services: Remote Desktop Protocol,RDP exposure enables remote desktop abuse
 NET-03,T1190,Exploit Public-Facing Application,Internet-reachable databases are directly attackable
 NET-04,T1190,Exploit Public-Facing Application,All ports open exposes every listening service
+NET-05,T1190,Exploit Public-Facing Application,An unauthenticated Docker API is directly attackable from the internet
+NET-05,T1610,Deploy Container,Attackers use an open Docker API to start containers on the host
+NET-06,T1190,Exploit Public-Facing Application,An exposed kubelet API is directly attackable from the internet
+NET-06,T1610,Deploy Container,Attackers use the kubelet API to run workloads on the node
+LOG-01,T1562.008,Impair Defenses: Disable or Modify Cloud Logs,Without CloudTrail attacker activity leaves no audit trail
+EC2-01,T1552.005,Unsecured Credentials: Cloud Instance Metadata API,IMDSv1 lets a request-forgery or code-execution foothold read instance role credentials

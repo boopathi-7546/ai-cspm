@@ -5,7 +5,7 @@ technique, weight it by how often that technique appears in threat-intelligence 
 **explainable** risk score with a dashboard.
 
 ```
-AWS config (JSON/YAML) -> rule engine (18 checks) -> misconfig->ATT&CK mapping ──┐
+AWS config (JSON/YAML) -> rule engine (22 checks) -> misconfig->ATT&CK mapping ──┐
 CTI reports (.txt) -> extractor (LLM optional, validated) -> evidence index ─────┴-> risk fusion -> SQLite -> Flask API -> HTML/CSS/JS dashboard
 ```
 
@@ -13,18 +13,24 @@ CTI reports (.txt) -> extractor (LLM optional, validated) -> evidence index ─�
 ```bash
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-pytest -q                     # 36 tests
-python run.py demo            # extract CTI, scan 3 sample envs, evaluate
+pytest -q                     # 44 tests
+python run.py demo            # extract CTI, scan 4 sample envs, evaluate
 python run.py dashboard       # http://127.0.0.1:5000  (click "Run demo scan")
 ```
 Docker: `docker build -t ai-cspm . && docker run -p 5000:5000 ai-cspm`
 
 Optional LLM extraction (otherwise a regex/keyword extractor is used):
-```bash
-cp .env.example .env   # add ANTHROPIC_API_KEY, then: export $(cat .env | xargs)
-python run.py extract --llm
+```
+copy .env.example .env        (Windows; use cp on Linux/macOS)
+```
+Open `.env` in an editor and put your key after `ANTHROPIC_API_KEY=` (no quotes needed). The project loads
+`.env` automatically; a real environment variable, if set, takes priority. `.env` is git-ignored: never commit it.
+```
+python run.py llm-check       # verifies key, SDK and model name with one tiny request (never prints the key)
+python run.py extract --llm   # re-extract CTI with the LLM (output is validated, see limitations)
 python run.py scan --llm-explain
 ```
+If `llm-check` reports a model error, set `CTI_LLM_MODEL` in `.env` to a model your key can use.
 
 ## Project layout
 ```
@@ -32,7 +38,7 @@ cspm/        scanner, rules, mapping, CTI extractor, fusion, db, evaluation (pur
 web/app.py   Flask JSON API  (/api/runs, /api/runs/<id>, /api/cti, /api/scan, /api/scan/demo, /api/evaluation)
 web/static/  index.html + style.css + app.js  (the dashboard; plain HTML/CSS/JS, no build step)
 data/        sample configs, CTI reports, ATT&CK mapping CSV, ground-truth labels
-tests/       36 pytest tests (rules, fusion, extractor, pipeline, web API)
+tests/       44 pytest tests (rules, fusion, extractor, pipeline, web API)
 ```
 Dashboard security notes: the page is served with a strict Content-Security-Policy, all data is inserted with
 `textContent` (a resource named `<img onerror=...>` stays text), uploads are limited to 1 MB `.json/.yaml/.yml`,
@@ -51,7 +57,9 @@ server and has no login: run it locally or behind your own auth, do not expose i
 ## Rules (data/mapping/misconfig_ttp.csv holds the ATT&CK mapping)
 IAM-01..08 (admin/service wildcards, root MFA/use, console MFA, key age, unused keys, password length),
 S3-01..06 (public read/write, Block Public Access, encryption, logging, versioning),
-NET-01..04 (SSH, RDP, DB ports, all-traffic open to the internet). Add a rule by writing one function with
+NET-01..06 (SSH, RDP, DB ports, all-traffic, Docker API 2375 and kubelet 10250 open to the internet),
+LOG-01 (CloudTrail disabled), EC2-01 (IMDSv2 not required). Every rule carries a curated one-sentence
+remediation that the dashboard shows as "Recommended fix". Add a rule by writing one function with
 the `@rule(...)` decorator in `cspm/rules.py` and a row in the mapping CSV.
 
 ## Evaluation (`python run.py evaluate` -> results/evaluation_results.json)
@@ -61,13 +69,13 @@ CTI extraction precision/recall on a labelled subset, and baseline (severity-onl
 ## Results on the shipped data (`python run.py demo`)
 | Measure | Value | How to read it |
 |---|---|---|
-| Detection precision / recall | 1.0 / 1.0 | Only shows the rules match the hand-written labels for the 3 sample configs. Not real-world accuracy. |
-| CTI extraction (offline), all labelled techniques | precision 0.889, recall 0.615 | 8 reports, 26 labelled techniques. |
-| CTI extraction (offline), techniques the risk score can use | precision 1.0, recall 0.588 | Parent/child IDs count as a match (as in fusion). |
+| Detection precision / recall | 1.0 / 1.0 | Only shows the rules match the hand-written labels for the 4 sample configs. Not real-world accuracy. |
+| CTI extraction (offline), all labelled techniques | precision 0.889, recall 0.615 | 8 reports, 26 labelled techniques (18 in scope). |
+| CTI extraction (offline), techniques the risk score can use | precision 1.0, recall 0.556 | Parent/child IDs count as a match (as in fusion). |
 | Ranking on `vulnerable_env` | top-5 overlap 4/5, mean rank change 3.25 | CTI + criticality reorders the severity-only list. |
-| Findings with CTI support | 18 of 24 | S3-01, S3-03, S3-04 get no CTI boost because the offline extractor missed T1530. |
+| Findings with CTI support | 18 of 24 | Vulnerable sample env. S3-01, S3-03, S3-04 get no CTI boost because the offline extractor missed T1530. |
 
-The last row is a real limitation, not a bug: reports R01 and R06 do describe theft from S3, but the offline
+The last row is a real limitation, not a bug (EC2-01 has the same problem: the extractor missed T1552): reports R01 and R06 do describe theft from S3, but the offline
 keyword extractor does not recognise that wording, so public-bucket findings lose their CTI boost. Run
 `python run.py extract --llm` (needs `ANTHROPIC_API_KEY`; this path could not be tested without a key) and
 compare. "Offline vs LLM extraction" is a good experiment for your report. The keyword map in

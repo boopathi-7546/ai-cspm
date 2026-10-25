@@ -2,6 +2,10 @@
 import os
 from pathlib import Path
 
+from .env import load_dotenv
+
+load_dotenv()  # reads <project>/.env; real environment variables take priority
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 CONFIG_DIR = DATA / "configs"

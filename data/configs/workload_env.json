@@ -1,0 +1,79 @@
+{
+  "description": "Compute, logging and container-API environment for the newer rules",
+  "cloudtrail": {
+    "enabled": false,
+    "multi_region": false,
+    "criticality": "high"
+  },
+  "ec2_instances": [
+    {
+      "name": "web-server-01",
+      "criticality": "medium",
+      "imds_v2_required": false
+    },
+    {
+      "name": "bastion-02",
+      "criticality": "high",
+      "imds_v2_required": true
+    },
+    {
+      "name": "batch-worker-03",
+      "criticality": "low",
+      "imds_v2_required": false
+    }
+  ],
+  "security_groups": [
+    {
+      "id": "sg-docker-host",
+      "name": "sg-docker-host",
+      "criticality": "high",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 2375,
+          "port_to": 2375,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "id": "sg-k8s-node",
+      "name": "sg-k8s-node",
+      "criticality": "high",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 10250,
+          "port_to": 10250,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "id": "sg-docker-internal",
+      "name": "sg-docker-internal",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 2375,
+          "port_to": 2375,
+          "cidr": "10.0.0.0/8"
+        }
+      ]
+    },
+    {
+      "id": "sg-k8s-internal",
+      "name": "sg-k8s-internal",
+      "criticality": "medium",
+      "ingress": [
+        {
+          "protocol": "tcp",
+          "port_from": 10250,
+          "port_to": 10250,
+          "cidr": "10.0.0.0/8"
+        }
+      ]
+    }
+  ]
+}

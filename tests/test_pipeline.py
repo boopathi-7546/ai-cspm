@@ -25,7 +25,7 @@ def test_end_to_end_run_persists_to_sqlite(tmp_path, monkeypatch):
     monkeypatch.setattr("cspm.cti_extractor.EXTRACTED_JSON", tmp_path / "cti.json")
     dbp = tmp_path / "t.db"
     runs = pipeline.run_all(CONFIG_DIR, dbp, refresh=True)
-    assert set(runs) == {"vulnerable_env", "secure_env", "ambiguous_env"}
+    assert set(runs) == {"vulnerable_env", "secure_env", "ambiguous_env", "workload_env"}
     conn = db.connect(dbp)
     vuln = db.load_findings(conn, runs["vulnerable_env"])
     assert len(vuln) == 24 and vuln[0]["fused_rank"] == 1

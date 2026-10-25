@@ -153,6 +153,7 @@ function openDrawer(f) {
   const body = clear($("drawerBody"));
   body.append(el("h3", { text: `${f.check_id} \u2013 ${f.resource}` }), badge(f.priority));
   body.append(el("p", { class: "explain", text: f.explanation }));
+  if (f.remediation) body.append(el("p", { class: "explain", text: "Recommended fix: " + f.remediation }));
   const rows = [
     ["Title", f.title], ["Detail", f.detail], ["Resource type", f.resource_type], ["Severity", f.severity],
     ["Asset criticality", f.criticality], ["ATT&CK techniques", f.technique_ids.join(", ") || "none"],

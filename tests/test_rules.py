@@ -8,7 +8,7 @@ def ids(cfg):
 
 
 def test_rule_ids_unique_and_count():
-    assert len({r.check_id for r in RULES}) == len(RULES) == 18
+    assert len({r.check_id for r in RULES}) == len(RULES) == 22
 
 
 def test_admin_wildcard_detected_and_scoped_policy_not():
@@ -74,3 +74,28 @@ def test_s3_rules():
 def test_sample_environments():
     assert ids(load_config(CONFIG_DIR / "secure_env.json")) == set()
     assert ids(load_config(CONFIG_DIR / "ambiguous_env.json")) == {("legacy-reports", "S3-03")}
+
+
+def test_every_rule_has_remediation():
+    for r in RULES:
+        assert r.remediation.endswith(".") and len(r.remediation) > 30, r.check_id
+    f = scan_config({"s3_buckets": [{"name": "b", "public_read": True}]})[0]
+    assert f.remediation and "public read" in f.remediation.lower()
+
+
+def test_new_rules():
+    cfg = {"cloudtrail": {"enabled": False},
+           "ec2_instances": [{"name": "a", "imds_v2_required": False}, {"name": "b", "imds_v2_required": True},
+                             {"name": "c"}]}
+    assert ids(cfg) == {("cloudtrail", "LOG-01"), ("a", "EC2-01")}
+    assert ids({"cloudtrail": {"enabled": True}}) == set()
+    assert ids(sg(("tcp", 2375, 2375, "0.0.0.0/0"))) == {("g", "NET-05")}
+    assert ids(sg(("tcp", 10250, 10250, "::/0"))) == {("g", "NET-06")}
+    assert ids(sg(("tcp", 2375, 2375, "10.0.0.0/8"), ("tcp", 10250, 10250, "10.0.0.0/8"))) == set()
+    assert ids(sg(("tcp", 2000, 3000, "0.0.0.0/0"))) == {("g", "NET-05")}
+
+
+def test_workload_sample_environment():
+    assert ids(load_config(CONFIG_DIR / "workload_env.json")) == {
+        ("cloudtrail", "LOG-01"), ("web-server-01", "EC2-01"), ("batch-worker-03", "EC2-01"),
+        ("sg-docker-host", "NET-05"), ("sg-k8s-node", "NET-06")}

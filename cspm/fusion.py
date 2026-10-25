@@ -36,6 +36,7 @@ class ScoredFinding:
     priority: str = "Low"
     explanation: str = ""
     explanation_source: str = "template"
+    remediation: str = ""
     baseline_rank: int = 0
     fused_rank: int = 0
 
@@ -90,7 +91,7 @@ def score_findings(findings: list[Finding], mapping: dict, evidence_index: dict,
             technique_ids=tids, cti_report_ids=sorted(reports), cti_actors=actors,
             cti_report_count=len(reports), total_reports=total_reports,
             cti_weight=round(weight, 4), cti_multiplier=round(1 + weight, 4),
-            risk_raw=raw, risk_score=score, priority=prio)
+            risk_raw=raw, risk_score=score, priority=prio, remediation=f.remediation)
         sf.explanation = build_explanation(sf)
         scored.append(sf)
 

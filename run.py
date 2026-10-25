@@ -5,6 +5,7 @@
   python run.py extract [--llm]      # (re)extract CTI from data/cti_reports
   python run.py scan [CONFIG ...]    # scan configs (default: all in data/configs)
   python run.py evaluate             # accuracy + ranking comparison -> results/
+  python run.py llm-check            # verify API key, SDK and model name
   python run.py dashboard            # launch the Flask dashboard on http://127.0.0.1:5000
 """
 import argparse
@@ -36,6 +37,7 @@ def main() -> int:
         if name == "scan":
             p.add_argument("configs", nargs="*")
     sub.add_parser("evaluate")
+    sub.add_parser("llm-check", help="verify the Anthropic API key, SDK and model name (one tiny request)")
     d = sub.add_parser("dashboard", help="start the Flask web dashboard")
     d.add_argument("--host", default="127.0.0.1")
     d.add_argument("--port", type=int, default=5000)
@@ -45,6 +47,23 @@ def main() -> int:
         from web.app import create_app
         print(f"Dashboard: http://{args.host}:{args.port}")
         create_app().run(host=args.host, port=args.port, debug=False)
+        return 0
+
+    if args.cmd == "llm-check":
+        from cspm.config import LLM_MODEL
+        from cspm.llm import complete, get_client
+        client = get_client()
+        if client is None:
+            print("No LLM client: set ANTHROPIC_API_KEY (environment variable or .env file) and run "
+                  "`pip install anthropic`. The key itself is never printed.")
+            return 1
+        try:
+            reply = complete(client, "Reply with the single word OK.", "ping", max_tokens=10)
+        except Exception as exc:  # report the problem, never the key
+            print(f"LLM call failed with model '{LLM_MODEL}': {type(exc).__name__}: {str(exc)[:200]}")
+            print("If the model name is wrong, set CTI_LLM_MODEL to a valid model.")
+            return 1
+        print(f"LLM OK with model '{LLM_MODEL}': {reply.strip()[:40]!r}")
         return 0
 
     if args.cmd == "extract":

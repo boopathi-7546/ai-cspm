@@ -18,12 +18,14 @@ class Finding:
     criticality: str
     detail: str
     category: str
+    remediation: str
 
     def to_dict(self) -> dict:
         return asdict(self)
 
 
-KNOWN_SECTIONS = ("account", "iam_users", "iam_policies", "s3_buckets", "security_groups")
+KNOWN_SECTIONS = ("account", "iam_users", "iam_policies", "s3_buckets", "security_groups",
+                  "ec2_instances", "cloudtrail")
 
 
 def parse_config(text: str, suffix: str = ".json") -> dict:
@@ -49,7 +51,7 @@ def scan_config(cfg: dict, rules: list[Rule] | None = None) -> list[Finding]:
     for r in rules or RULES:
         for resource, rtype, crit, detail in r.fn(cfg):
             findings.append(Finding(resource, rtype, r.check_id, r.title,
-                                    r.severity, crit, detail, r.category))
+                                    r.severity, crit, detail, r.category, r.remediation))
     return findings
 
 
@@ -61,6 +63,8 @@ def list_resources(cfg: dict) -> list[str]:
         names.append(ROOT_RESOURCE)
     if "password_policy" in acct:
         names.append(PASSWORD_POLICY_RESOURCE)
-    for key in ("iam_users", "iam_policies", "s3_buckets", "security_groups"):
+    if "cloudtrail" in cfg:
+        names.append("cloudtrail")
+    for key in ("iam_users", "iam_policies", "s3_buckets", "security_groups", "ec2_instances"):
         names += [x["name"] for x in cfg.get(key, [])]
     return names

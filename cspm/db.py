@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS findings(
   technique_ids TEXT, cti_report_ids TEXT, cti_actors TEXT, cti_report_count INTEGER,
   total_reports INTEGER, cti_weight REAL, risk_raw REAL, risk_score REAL, priority TEXT,
   explanation TEXT, explanation_source TEXT, baseline_rank INTEGER, fused_rank INTEGER,
+  remediation TEXT DEFAULT '',
   FOREIGN KEY(run_id) REFERENCES runs(run_id));
 CREATE TABLE IF NOT EXISTS cti_techniques(
   report_id TEXT, technique_id TEXT, evidence TEXT, evidence_verified INTEGER, actors TEXT, method TEXT);
@@ -29,6 +30,10 @@ def connect(path: Path = DB_PATH) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    cols = {r["name"] for r in conn.execute("PRAGMA table_info(findings)")}
+    if "remediation" not in cols:  # database created by an older version of the project
+        conn.execute("ALTER TABLE findings ADD COLUMN remediation TEXT DEFAULT ''")
+        conn.commit()
     return conn
 
 

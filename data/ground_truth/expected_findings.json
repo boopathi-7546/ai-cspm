@@ -103,5 +103,27 @@
       "legacy-reports",
       "S3-03"
     ]
+  ],
+  "workload_env": [
+    [
+      "cloudtrail",
+      "LOG-01"
+    ],
+    [
+      "web-server-01",
+      "EC2-01"
+    ],
+    [
+      "batch-worker-03",
+      "EC2-01"
+    ],
+    [
+      "sg-docker-host",
+      "NET-05"
+    ],
+    [
+      "sg-k8s-node",
+      "NET-06"
+    ]
   ]
 }

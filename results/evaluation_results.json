@@ -1,7 +1,7 @@
 {
   "detection": {
     "overall": {
-      "tp": 25,
+      "tp": 30,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -38,9 +38,19 @@
         "f1": 1.0,
         "false_positives": [],
         "missed": []
+      },
+      "workload_env": {
+        "tp": 5,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positives": [],
+        "missed": []
       }
     },
-    "clean_resources": 17,
+    "clean_resources": 20,
     "clean_resources_flagged": 0,
     "false_positive_resource_rate": 0.0
   },
@@ -54,10 +64,10 @@
       "f1": 0.727
     },
     "in_scope": {
-      "labelled_techniques": 17,
+      "labelled_techniques": 18,
       "extracted_techniques": 10,
       "precision": 1.0,
-      "recall": 0.588
+      "recall": 0.556
     },
     "per_report": {
       "R01_scarleteel_2023": {
@@ -217,13 +227,14 @@
     ]
   },
   "mapping_coverage": {
-    "checks_mapped": 18,
-    "checks_with_cti_support": 15,
+    "checks_mapped": 22,
+    "checks_with_cti_support": 18,
     "unsupported_checks": [
+      "EC2-01",
       "S3-01",
       "S3-03",
       "S3-04"
     ]
   },
-  "note": "Sample data only: numbers describe the bundled test set, not real-world accuracy."
+  "note": "Detection numbers come from 3 hand-made sample configs. CTI numbers come from 8 paraphrased public reports labelled by one reader. Both sets are small, so treat the results as indicative only."
 }
