@@ -1,0 +1,6 @@
+Title: Cryptomining through exposed APIs (sample)
+Source: SAMPLE summary written for this project (synthetic) - replace with a real public CTI report
+Published: n/a
+Actors: MineWorm
+
+Operators known as MineWorm found an exposed Docker API on cloud instances and launched containers that ran a cryptocurrency miner. Resource spikes were the first sign. Related file hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.

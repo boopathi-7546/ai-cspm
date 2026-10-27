@@ -63,20 +63,28 @@ def _is_world(rule_: dict) -> bool:
 
 
 def _is_all_traffic(rule_: dict) -> bool:
+    if not isinstance(rule_, dict):
+        return False
     proto = str(rule_.get("protocol", "tcp")).lower()
-    lo = int(rule_.get("port_from", 0))
-    hi = int(rule_.get("port_to", 65535))
+    try:
+        lo = int(rule_.get("port_from", 0))
+        hi = int(rule_.get("port_to", 65535))
+    except (ValueError, TypeError):
+        lo, hi = 0, 65535
     return proto in ("-1", "all") or (lo == 0 and hi == 65535)
 
 
 def _exposes_port(rule_: dict, ports) -> bool:
     """True if the ingress rule opens a specific TCP port in `ports` to the world.
     All-traffic rules are excluded here; NET-04 reports those separately."""
-    if not _is_world(rule_) or _is_all_traffic(rule_):
+    if not isinstance(rule_, dict) or not _is_world(rule_) or _is_all_traffic(rule_):
         return False
     if str(rule_.get("protocol", "tcp")).lower() not in ("tcp", "6"):
         return False
-    lo, hi = int(rule_["port_from"]), int(rule_["port_to"])
+    try:
+        lo, hi = int(rule_["port_from"]), int(rule_["port_to"])
+    except (KeyError, ValueError, TypeError):
+        return False
     return any(lo <= p <= hi for p in ports)
 
 
@@ -208,10 +216,17 @@ def s3_no_versioning(cfg):
 # ---------------------------------------------------------------- Network
 def _sg_rule(cfg, predicate, detail):
     for sg in cfg.get("security_groups", []):
+        if not isinstance(sg, dict) or "name" not in sg:
+            continue
         for r in sg.get("ingress", []):
-            if predicate(r):
-                yield (sg["name"], "security_group", _crit(sg), f"{detail} ({r.get('cidr')})")
-                break
+            if not isinstance(r, dict):
+                continue
+            try:
+                if predicate(r):
+                    yield (str(sg["name"]), "security_group", _crit(sg), f"{detail} ({r.get('cidr')})")
+                    break
+            except Exception:
+                continue
 
 
 @rule("NET-01", "Security group allows SSH (22) from the internet", "High", "Network",

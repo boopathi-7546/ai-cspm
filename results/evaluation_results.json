@@ -236,5 +236,5 @@
       "S3-04"
     ]
   },
-  "note": "Detection numbers come from 3 hand-made sample configs. CTI numbers come from 8 paraphrased public reports labelled by one reader. Both sets are small, so treat the results as indicative only."
+  "note": "Detection numbers come from 4 hand-made sample configs. CTI numbers come from 8 paraphrased public reports labelled by one reader. Both sets are small, so treat the results as indicative only."
 }

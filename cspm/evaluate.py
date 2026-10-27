@@ -107,6 +107,22 @@ def evaluate_mapping_coverage(cti: list[dict]) -> dict:
             "unsupported_checks": sorted(c for c, v in covered.items() if not v)}
 
 
+def compare_extractors(cti_dir: Path, labels_path: Path, client=None) -> dict:
+    """Compare offline keyword/regex extractor against optional LLM extractor on the same labelled corpus."""
+    from .cti_extractor import extract_corpus
+    offline_results = extract_corpus(cti_dir, client=None, out_json=None)
+    offline_eval = evaluate_extraction(offline_results, labels_path=labels_path)
+    
+    comp = {
+        "offline": offline_eval,
+        "llm": None,
+    }
+    if client is not None:
+        llm_results = extract_corpus(cti_dir, client=client, out_json=None)
+        comp["llm"] = evaluate_extraction(llm_results, labels_path=labels_path)
+    return comp
+
+
 def run_evaluation(cti: list[dict], out_dir: Path = RESULTS_DIR, write: bool = True) -> dict:
     result = {"detection": evaluate_detection(), "extraction": evaluate_extraction(cti),
               "ranking": evaluate_ranking(cti), "mapping_coverage": evaluate_mapping_coverage(cti),

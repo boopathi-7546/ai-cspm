@@ -1,0 +1,6 @@
+Title: Defence evasion in cloud accounts (sample)
+Source: SAMPLE summary written for this project (synthetic) - replace with a real public CTI report
+Published: n/a
+Actors: LogGhost
+
+The group tracked as LogGhost signed in using stolen credentials and then disabled CloudTrail logging in the account before copying data. Responders noted that storage access logs were also switched off, which delayed detection.

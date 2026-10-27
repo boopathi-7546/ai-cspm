@@ -200,7 +200,10 @@ def complete(client, system: str, user: str, max_tokens: int = 1500) -> str:
                         config = _make_config(None)
                         continue
                     if attempt < retries and _is_rate_limit(exc):
-                        sleep_time = max(base_backoff * (2 ** attempt), _get_llm_delay())
+                        if os.getenv("CSPM_RETRY_BACKOFF"):
+                            sleep_time = base_backoff * (2 ** attempt)
+                        else:
+                            sleep_time = max(base_backoff * (2 ** attempt), _get_llm_delay())
                         time.sleep(sleep_time)
                         continue
                     raise

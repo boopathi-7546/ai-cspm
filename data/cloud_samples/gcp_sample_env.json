@@ -1,0 +1,82 @@
+{
+  "_metadata": {
+    "is_sample": true,
+    "provider": "gcp",
+    "scan_type": "offline_fixture",
+    "disclaimer": "OFFLINE SIMULATION FIXTURE ONLY - NOT LIVE SCAN RESULTS",
+    "description": "Simulated Google Cloud Platform environment containing Cloud Storage Buckets, Compute Firewalls, and IAM."
+  },
+  "account": {
+    "provider": "gcp",
+    "project_id": "gcp-prod-analytics-demo",
+    "is_live": false
+  },
+  "s3_buckets": [
+    {
+      "name": "gcs-analytics-export-bucket",
+      "criticality": "high",
+      "public_read": true,
+      "encrypted": false,
+      "logging_enabled": false,
+      "versioning_enabled": false
+    },
+    {
+      "name": "gcs-audit-logs-private",
+      "criticality": "high",
+      "public_read": false,
+      "encrypted": true,
+      "logging_enabled": true,
+      "versioning_enabled": true
+    }
+  ],
+  "security_groups": [
+    {
+      "name": "gcp-default-allow-ssh",
+      "criticality": "high",
+      "ingress_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 22,
+          "to_port": 22,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "name": "gcp-allow-k8s-nodeports",
+      "criticality": "high",
+      "ingress_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 10250,
+          "to_port": 10250,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    }
+  ],
+  "iam_users": [
+    {
+      "name": "gcp-terraform-sa@gcp-prod-analytics-demo.iam.gserviceaccount.com",
+      "mfa_enabled": false,
+      "password_last_used_days": 10,
+      "attached_policies": [
+        "roles/owner"
+      ]
+    }
+  ],
+  "iam_policies": [
+    {
+      "name": "roles/owner",
+      "document": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "*",
+            "Resource": "*"
+          }
+        ]
+      }
+    }
+  ]
+}

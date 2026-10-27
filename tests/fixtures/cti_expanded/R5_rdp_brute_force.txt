@@ -1,0 +1,6 @@
+Title: Remote desktop brute force against cloud hosts (sample)
+Source: SAMPLE summary written for this project (synthetic) - replace with a real public CTI report
+Published: n/a
+Actors: RDPReaper
+
+RDPReaper ran brute force attacks (T1110) against cloud virtual machines whose remote desktop port was open to the internet (T1021.001). The exposed remote access service gave them an entry point (T1133). Attacks originated from 198.51.100.99 and rdp-check.example-scan.net.

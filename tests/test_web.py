@@ -90,3 +90,40 @@ def test_remediation_served_by_api(client):
     runs = client.post("/api/scan/demo").get_json()["runs"]
     d = client.get(f"/api/runs/{runs['vulnerable_env']}").get_json()
     assert all(f["remediation"] for f in d["findings"])
+
+
+def test_upload_terraform_scan(client):
+    tf_content = b'''
+    resource "aws_s3_bucket" "insecure" {
+      bucket = "my-public-bucket"
+      acl    = "public-read"
+    }
+    '''
+    r = upload(client, "infra.tf", tf_content)
+    assert r.status_code == 200
+    res = r.get_json()
+    assert res["findings"] >= 1
+    rid = res["run_id"]
+    detail = client.get(f"/api/runs/{rid}").get_json()
+    assert any(f["check_id"] == "S3-01" for f in detail["findings"])
+
+
+def test_attack_paths_and_compliance_endpoints(client):
+    runs = client.post("/api/scan/demo").get_json()["runs"]
+    vuln_run = runs["vulnerable_env"]
+
+    # Attack paths endpoint
+    ap_res = client.get(f"/api/runs/{vuln_run}/attack-paths")
+    assert ap_res.status_code == 200
+    ap_data = ap_res.get_json()
+    assert "attack_paths" in ap_data
+    assert len(ap_data["attack_paths"]) >= 1
+
+    # Compliance endpoint
+    comp_res = client.get(f"/api/runs/{vuln_run}/compliance")
+    assert comp_res.status_code == 200
+    comp_data = comp_res.get_json()
+    assert "compliance" in comp_data
+    assert "benchmarks" in comp_data["compliance"]
+    assert "cis_aws" in comp_data["compliance"]["benchmarks"]
+

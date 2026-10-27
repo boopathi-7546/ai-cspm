@@ -1,5 +1,16 @@
 flask>=3.0
 pyyaml>=6.0
-anthropic>=0.40   # optional: only needed for --llm
+networkx>=3.0
+python-hcl2>=8.0
+boto3>=1.30          # optional: live AWS scanning
+anthropic>=0.40      # optional: only needed for --llm (Anthropic)
 google-genai>=0.1.0  # optional: only needed for --llm (Gemini)
 pytest>=8.0
+
+# Optional Live Cloud Connectors:
+# azure-identity>=1.15.0
+# azure-mgmt-storage>=21.0.0
+# azure-mgmt-network>=25.0.0
+# azure-mgmt-authorization>=4.0.0
+# google-cloud-storage>=2.14.0
+# google-cloud-compute>=1.15.0

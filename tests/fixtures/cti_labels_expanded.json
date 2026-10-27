@@ -1,0 +1,19 @@
+{
+  "_note": "Expanded benchmark dataset containing positive attack campaigns and negative control reports.",
+  "R1_cloud_credential_theft": [
+    "T1552.001",
+    "T1078.004",
+    "T1530"
+  ],
+  "R5_rdp_brute_force": [
+    "T1110",
+    "T1021.001",
+    "T1133"
+  ],
+  "R6_log_tampering": [
+    "T1562.008",
+    "T1078.004"
+  ],
+  "R9_clean_infrastructure": [],
+  "R10_prompt_injection_test": []
+}

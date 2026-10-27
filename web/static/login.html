@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In &mdash; AI-CSPM Cloud Security</title>
+  <meta name="description" content="Sign in to the AI-CSPM Cloud Security Posture Management console.">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-body">
+  <!-- Minimal Header -->
+  <header class="login-header">
+    <div class="container login-header-wrap">
+      <a href="/" class="brand-link" title="Return to Homepage">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <span>AI-CSPM</span>
+        <span class="logo-tag">SaaS</span>
+      </a>
+
+      <a href="/" class="login-back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Homepage
+      </a>
+    </div>
+  </header>
+
+  <!-- Login Card Section -->
+  <main class="login-main">
+    <div class="login-card-container">
+      <div class="login-card" id="loginCard">
+        <!-- Card Header Badge & Icon -->
+        <div class="login-badge-wrap">
+          <div class="login-shield-badge">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <rect x="9" y="9" width="6" height="6" rx="1"/>
+            </svg>
+          </div>
+        </div>
+
+        <h1 class="login-title">Sign In to AI-CSPM</h1>
+        <p class="login-subtitle">
+          Enter your administrator or security analyst credentials to access the cloud security posture management dashboard.
+        </p>
+
+        <!-- Dynamic Alert Box -->
+        <div id="loginAlert" class="login-alert" role="alert" style="display: none;">
+          <div class="alert-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <span id="loginAlertText" class="alert-text"></span>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" method="POST" action="/login" class="login-form">
+          <input type="hidden" name="csrf_token" id="csrfToken" value="">
+          <input type="hidden" name="next" id="nextUrl" value="">
+
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <div class="input-wrap">
+              <div class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                class="form-input with-icon" 
+                placeholder="e.g. admin" 
+                required 
+                autocomplete="username" 
+                autofocus
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label-row">
+              <label for="password" class="form-label">Password</label>
+            </div>
+            <div class="input-wrap">
+              <div class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-input with-icon with-action" 
+                placeholder="••••••••••••" 
+                required 
+                autocomplete="current-password"
+              >
+              <button 
+                type="button" 
+                id="togglePasswordBtn" 
+                class="password-toggle-btn" 
+                aria-label="Toggle password visibility"
+                title="Show / hide password"
+              >
+                <svg id="eyeIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeOffIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary btn-block btn-lg login-submit-btn">
+            <span class="btn-text">Sign In to Dashboard</span>
+            <span class="btn-spinner" id="btnSpinner" style="display: none;"></span>
+          </button>
+        </form>
+
+        <div class="login-footer-security">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Secured with scrypt hashing, rate limiting, and HTTP-only cookies.</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("loginForm");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+      const eyeIcon = document.getElementById("eyeIcon");
+      const eyeOffIcon = document.getElementById("eyeOffIcon");
+      const submitBtn = document.getElementById("submitBtn");
+      const btnText = submitBtn.querySelector(".btn-text");
+      const btnSpinner = document.getElementById("btnSpinner");
+      const alertBox = document.getElementById("loginAlert");
+      const alertText = document.getElementById("loginAlertText");
+      const csrfInput = document.getElementById("csrfToken");
+      const nextInput = document.getElementById("nextUrl");
+      const loginCard = document.getElementById("loginCard");
+
+      // Parse query params for next, error, or logged_out
+      const params = new URLSearchParams(window.location.search);
+      const nextParam = params.get("next") || "/#dashboard";
+      nextInput.value = nextParam;
+
+      if (params.get("logged_out")) {
+        showAlert("You have been signed out successfully.", "info");
+      } else if (params.get("error")) {
+        showAlert(params.get("error"), "error");
+      }
+
+      // Check if user is already logged in
+      fetch("/api/auth/me")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data && data.authenticated) {
+            window.location.href = nextParam;
+          }
+        })
+        .catch(function () {});
+
+      // Fetch fresh CSRF token
+      fetch("/api/auth/csrf")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data && data.csrf_token) {
+            csrfInput.value = data.csrf_token;
+          }
+        })
+        .catch(function () {});
+
+      // Toggle password show/hide
+      togglePasswordBtn.addEventListener("click", function () {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        eyeIcon.style.display = isPassword ? "none" : "block";
+        eyeOffIcon.style.display = isPassword ? "block" : "none";
+        togglePasswordBtn.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+        passwordInput.focus();
+      });
+
+      function showAlert(msg, type) {
+        alertText.textContent = msg;
+        alertBox.className = "login-alert " + (type === "info" ? "alert-info" : "alert-error");
+        alertBox.style.display = "flex";
+      }
+
+      function hideAlert() {
+        alertBox.style.display = "none";
+      }
+
+      function setLoading(loading) {
+        submitBtn.disabled = loading;
+        btnText.textContent = loading ? "Authenticating..." : "Sign In to Dashboard";
+        btnSpinner.style.display = loading ? "inline-block" : "none";
+      }
+
+      function shakeCard() {
+        loginCard.classList.remove("shake-anim");
+        void loginCard.offsetWidth; // trigger reflow
+        loginCard.classList.add("shake-anim");
+      }
+
+      // Form submission via async AJAX with graceful fallback
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        hideAlert();
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const csrfToken = csrfInput.value;
+
+        if (!username || !password) {
+          showAlert("Please enter both username and password.", "error");
+          return;
+        }
+
+        setLoading(true);
+
+        fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+            csrf_token: csrfToken
+          })
+        })
+        .then(function (res) {
+          return res.json().then(function (data) {
+            return { status: res.status, ok: res.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          setLoading(false);
+          if (result.ok && result.data && result.data.ok) {
+            btnText.textContent = "Success! Redirecting...";
+            submitBtn.style.background = "#15803D"; // green success
+            setTimeout(function () {
+              window.location.href = nextParam;
+            }, 300);
+          } else {
+            const errorMsg = (result.data && result.data.error) || "Invalid username or password.";
+            showAlert(errorMsg, "error");
+            shakeCard();
+            passwordInput.value = "";
+            passwordInput.focus();
+          }
+        })
+        .catch(function (err) {
+          // If fetch fails (e.g. offline/network issue), fallback to standard form POST
+          form.submit();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

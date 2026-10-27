@@ -30,6 +30,8 @@ def connect(path: Path = DB_PATH) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    from .auth import init_auth_db
+    init_auth_db(conn)
     cols = {r["name"] for r in conn.execute("PRAGMA table_info(findings)")}
     if "remediation" not in cols:  # database created by an older version of the project
         conn.execute("ALTER TABLE findings ADD COLUMN remediation TEXT DEFAULT ''")

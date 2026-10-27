@@ -1,0 +1,90 @@
+{
+  "_metadata": {
+    "is_sample": true,
+    "provider": "azure",
+    "scan_type": "offline_fixture",
+    "disclaimer": "OFFLINE SIMULATION FIXTURE ONLY - NOT LIVE SCAN RESULTS",
+    "description": "Simulated Azure environment containing Storage Accounts, Network Security Groups, and Role Assignments."
+  },
+  "account": {
+    "provider": "azure",
+    "subscription_id": "sub-demo-azure-12345678",
+    "tenant_id": "tenant-demo-corp-87654321",
+    "is_live": false
+  },
+  "s3_buckets": [
+    {
+      "name": "az-customer-data-blob",
+      "criticality": "high",
+      "public_read": true,
+      "encrypted": false,
+      "logging_enabled": false,
+      "versioning_enabled": true
+    },
+    {
+      "name": "az-internal-logs-blob",
+      "criticality": "medium",
+      "public_read": false,
+      "encrypted": true,
+      "logging_enabled": true,
+      "versioning_enabled": true
+    }
+  ],
+  "security_groups": [
+    {
+      "name": "nsg-frontend-web",
+      "criticality": "high",
+      "ingress_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 22,
+          "to_port": 22,
+          "cidr": "0.0.0.0/0"
+        },
+        {
+          "protocol": "tcp",
+          "from_port": 443,
+          "to_port": 443,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    },
+    {
+      "name": "nsg-backend-db",
+      "criticality": "high",
+      "ingress_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 3389,
+          "to_port": 3389,
+          "cidr": "0.0.0.0/0"
+        }
+      ]
+    }
+  ],
+  "iam_users": [
+    {
+      "name": "azure-devops-spn",
+      "mfa_enabled": false,
+      "password_last_used_days": 15,
+      "attached_policies": [
+        "Contributor",
+        "OwnerAll"
+      ]
+    }
+  ],
+  "iam_policies": [
+    {
+      "name": "OwnerAll",
+      "document": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "*",
+            "Resource": "*"
+          }
+        ]
+      }
+    }
+  ]
+}

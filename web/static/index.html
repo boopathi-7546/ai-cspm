@@ -3,72 +3,727 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI-CSPM Dashboard</title>
+  <title>AI-CSPM &mdash; AI-Driven Cloud Security Posture Management</title>
+  <meta name="description" content="Secure your cloud infrastructure with AI-driven posture management, automated misconfiguration detection, MITRE ATT&CK mapping, and threat intelligence fusion.">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header class="top">
-    <div>
-      <h1>AI-CSPM</h1>
-      <p class="sub">Cloud misconfigurations &rarr; MITRE ATT&amp;CK &rarr; CTI relevance &rarr; explainable risk score</p>
-    </div>
-    <div class="controls">
-      <label>Run
-        <select id="runSelect" aria-label="Select scan run"></select>
-      </label>
-      <button id="demoBtn" type="button">Run demo scan</button>
-      <label class="filebtn">Scan your config
-        <input id="fileInput" type="file" accept=".json,.yaml,.yml">
-      </label>
+  <!-- ========================================================================
+       Navigation Bar
+       ======================================================================== -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="/" class="brand-link">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <span>AI-CSPM</span>
+        <span class="logo-tag">SaaS</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#threat-intel">Threat Intelligence</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#documentation">Docs</a></li>
+          <li class="mobile-only-link"><a href="/login" id="mobileLoginLink">Sign In</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions" id="navActions">
+        <a href="#dashboard" class="btn btn-secondary btn-sm" id="navDashboardBtn">Live Dashboard</a>
+        <button id="navScanBtn" type="button" class="btn btn-primary btn-sm">Start Security Scan</button>
+        <a href="/login" id="navLoginBtn" class="btn btn-outline btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          Login
+        </a>
+        <div id="navUserBadge" class="nav-user-badge" style="display: none;">
+          <span class="user-avatar-dot"></span>
+          <span id="navUsername" class="nav-username">admin</span>
+          <button id="navLogoutBtn" type="button" class="btn btn-ghost" title="Log Out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Logout
+          </button>
+        </div>
+        <button id="mobileMenuBtn" class="mobile-toggle" aria-label="Toggle navigation menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
-  <p id="status" role="status" aria-live="polite"></p>
+  <!-- ========================================================================
+       Hero Section
+       ======================================================================== -->
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge-wrap">
+          <div class="hero-badge">
+            <span class="pulse-dot"></span>
+            <span>AI-Powered Cloud Security</span>
+          </div>
+        </div>
 
-  <main>
-    <section id="metrics" class="cards" aria-label="Summary"></section>
+        <h1 class="hero-headline">
+          Secure Your Cloud. <br>
+          <span class="accent-text">Stay Ahead of Threats.</span>
+        </h1>
 
-    <nav class="tabs" role="tablist" aria-label="Views">
-      <button role="tab" class="tab active" data-tab="findings" aria-selected="true">Findings</button>
-      <button role="tab" class="tab" data-tab="compare" aria-selected="false">Baseline vs fused</button>
-      <button role="tab" class="tab" data-tab="cti" aria-selected="false">CTI evidence</button>
-      <button role="tab" class="tab" data-tab="eval" aria-selected="false">Evaluation</button>
-    </nav>
+        <p class="hero-description">
+          Detect cloud misconfigurations, map exposure directly to the MITRE ATT&amp;CK matrix, and fuse real-world cyber threat intelligence to prioritize the critical risks that actually matter.
+        </p>
 
-    <section id="tab-findings" class="panel">
-      <div class="filters">
-        <input id="search" type="search" placeholder="Search resource, check or technique" aria-label="Search findings">
-        <select id="priorityFilter" aria-label="Filter by priority">
-          <option value="">All priorities</option>
-          <option>Critical</option><option>High</option><option>Medium</option><option>Low</option>
-        </select>
-        <select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option></select>
+        <div class="hero-cta-group">
+          <a href="#dashboard" id="heroStartScanBtn" class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Start Security Scan
+          </a>
+          <a href="#features" class="btn btn-secondary btn-lg">
+            Explore Features
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="hero-trust-bar">
+          <div class="trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Deterministic Rule Engine</span>
+          </div>
+          <div class="trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>MITRE ATT&amp;CK Matrix v14</span>
+          </div>
+          <div class="trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>AI Threat Intel Fusion</span>
+          </div>
+        </div>
       </div>
-      <div class="tablewrap"><table id="findingsTable"></table></div>
-      <p class="hint">Click a row for the full explanation. Click a column header to sort.</p>
-    </section>
 
-    <section id="tab-compare" class="panel hidden">
-      <p class="hint">Rank 1 is the most urgent. &ldquo;Baseline&rdquo; uses severity only; &ldquo;Fused&rdquo; uses severity &times; asset criticality &times; (1 + CTI weight).</p>
-      <div id="bars"></div>
-      <div class="tablewrap"><table id="compareTable"></table></div>
-    </section>
+      <!-- Right Column: Interactive Posture Sentinel HUD -->
+      <div class="hero-preview-wrap">
+        <div class="hero-preview-card">
+          <div class="preview-card-header">
+            <div class="preview-title-box">
+              <div class="preview-shield-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="preview-card-title">AI-CSPM Posture Sentinel</h3>
+                <p class="preview-card-sub">Multi-Cloud Security Fabric</p>
+              </div>
+            </div>
+            <div class="status-pill-green">
+              <span class="green-dot"></span>
+              Live Engine Active
+            </div>
+          </div>
 
-    <section id="tab-cti" class="panel hidden">
-      <h2>Reports mentioning each technique</h2>
-      <div id="ctiBars"></div>
-      <div class="tablewrap"><table id="ctiTable"></table></div>
-    </section>
+          <div class="preview-score-widget">
+            <div class="score-widget-left">
+              <span class="score-widget-label">Sample Security Score</span>
+              <div class="score-widget-val">
+                92 <span class="score-widget-denom">/ 100</span>
+              </div>
+              <span class="score-tag-pill">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Optimal Posture Target
+              </span>
+            </div>
+            <div class="score-ring-placeholder">
+              <span>92%</span>
+            </div>
+          </div>
 
-    <section id="tab-eval" class="panel hidden">
-      <div id="evalBody"></div>
-    </section>
-  </main>
+          <div class="preview-threat-item">
+            <div class="threat-item-top">
+              <span class="threat-item-name">Public Storage Bucket Exposure</span>
+              <span class="threat-tag">T1530</span>
+            </div>
+            <p class="threat-item-desc">
+              Unrestricted read access on critical cloud data assets. Elevated by 8 active CTI reports.
+            </p>
+          </div>
 
+          <div class="preview-threat-item">
+            <div class="threat-item-top">
+              <span class="threat-item-name">Overpermissive IAM Wildcard</span>
+              <span class="threat-tag">T1078</span>
+            </div>
+            <p class="threat-item-desc">
+              Administrator-level policy assignment without MFA. Mapped to initial access techniques.
+            </p>
+          </div>
+
+          <div class="preview-card-footer">
+            <span>Fusion Formula:</span>
+            <span class="formula-pill">Severity &times; Asset &times; (1 + CTI)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Features Section
+       ======================================================================== -->
+  <section id="features" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Core Capabilities</span>
+        <h2 class="section-title">Designed for Modern Cloud Defense</h2>
+        <p class="section-subtitle">
+          Traditional security scanners drown engineers in hundreds of static warnings. AI-CSPM fuses threat actor intelligence to isolate the genuine attack paths.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Cloud Misconfiguration Detection</h3>
+          <p class="feature-desc">
+            Deterministic static evaluation of cloud manifests across S3 buckets, IAM roles, Security Groups, RDS databases, and compute workloads with zero noise.
+          </p>
+          <div class="feature-tag-list">
+            <span class="feature-pill">S3 &amp; Storage</span>
+            <span class="feature-pill">IAM &amp; Auth</span>
+            <span class="feature-pill">VPC / Firewalls</span>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5 8 12 8 12s8-7 8-12a8 8 0 0 0-8-8z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">AI-Powered Threat Intelligence</h3>
+          <p class="feature-desc">
+            Automated LLM extraction parsing genuine CTI reports (Mandiant, CISA, Unit 42) into verified adversary technique mentions and exploit evidence.
+          </p>
+          <div class="feature-tag-list">
+            <span class="feature-pill">Gemini &amp; Claude</span>
+            <span class="feature-pill">Evidence Verification</span>
+            <span class="feature-pill">Campaign Intel</span>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2"/>
+              <path d="M3 9h18"/>
+              <path d="M3 15h18"/>
+              <path d="M9 3v18"/>
+              <path d="M15 3v18"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">MITRE ATT&amp;CK Mapping</h3>
+          <p class="feature-desc">
+            Directly binds infrastructure flaws to enterprise ATT&amp;CK techniques like T1530, T1078, and T1552, illustrating how adversaries chain misconfigurations.
+          </p>
+          <div class="feature-tag-list">
+            <span class="feature-pill">Technique Linking</span>
+            <span class="feature-pill">Kill Chain Context</span>
+            <span class="feature-pill">TTP Correlation</span>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Intelligent Risk Prioritization</h3>
+          <p class="feature-desc">
+            Mathematically fuses rule severity with business asset criticality and real-world CTI frequency, ensuring your team remediates high-threat assets first.
+          </p>
+          <div class="feature-tag-list">
+            <span class="feature-pill">Fused Risk Score</span>
+            <span class="feature-pill">Dynamic Reranking</span>
+            <span class="feature-pill">Zero Fatigue</span>
+          </div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2"/>
+              <path d="M9 17V7"/>
+              <path d="M15 17V12"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Security Findings Dashboard</h3>
+          <p class="feature-desc">
+            High-performance operational interface equipped with live search, priority filters, baseline-vs-fused comparisons, and deep-dive drawer views.
+          </p>
+          <div class="feature-tag-list">
+            <span class="feature-pill">Instant Filtering</span>
+            <span class="feature-pill">Slide-Over Inspector</span>
+            <span class="feature-pill">Sortable Columns</span>
+          </div>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Actionable Remediation Guidance</h3>
+          <p class="feature-desc">
+            Precise step-by-step remediation commands, Terraform patches, and CLI directives served alongside every finding for rapid risk resolution.
+          </p>
+          <div class="feature-tag-list">
+            <span class="feature-pill">1-Click Copy Fix</span>
+            <span class="feature-pill">CLI Commands</span>
+            <span class="feature-pill">Infrastructure as Code</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       How It Works Section
+       ======================================================================== -->
+  <section id="how-it-works" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Simple Workflow</span>
+        <h2 class="section-title">How AI-CSPM Protects Your Cloud</h2>
+        <p class="section-subtitle">
+          Go from raw infrastructure configurations to prioritized, attack-informed mitigation plans in three clear steps.
+        </p>
+      </div>
+
+      <div class="how-it-works-grid">
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Upload Cloud Configuration</h3>
+          <p class="step-desc">
+            Provide your multi-cloud JSON or YAML configuration manifests representing your cloud topology, identity permissions, storage policies, and networks.
+          </p>
+          <div class="step-snippet">
+            <span>$ ai-cspm scan --file cloud-env.json</span>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3 class="step-title">Scan &amp; Fuse Threat Intel</h3>
+          <p class="step-desc">
+            The scanner evaluates compliance rules, maps findings to the MITRE ATT&amp;CK matrix, and applies real-time threat intelligence weights from known cyber campaigns.
+          </p>
+          <div class="step-snippet">
+            <span>Risk = Severity &times; Criticality &times; (1 + CTI)</span>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3 class="step-title">Review &amp; Remediate</h3>
+          <p class="step-desc">
+            Review your prioritized security posture, compare baseline versus fused ranks, inspect deep adversary context, and copy verified remediation fixes.
+          </p>
+          <div class="step-snippet">
+            <span>aws s3api put-public-access-block ...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Threat Intelligence Highlight Section
+       ======================================================================== -->
+  <section id="threat-intel" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Cyber Threat Intelligence</span>
+        <h2 class="section-title">Why Traditional Scoring Falls Short</h2>
+        <p class="section-subtitle">
+          Static CVSS or severity-only ratings treat every resource the same. Real threat actors target specific high-value assets and exploitable techniques.
+        </p>
+      </div>
+
+      <div class="threat-compare-grid">
+        <div class="compare-card">
+          <h3 class="compare-card-title">Traditional CSPM</h3>
+          <p class="compare-card-subtitle">Severity-Only Static Ranking</p>
+          <ul class="compare-list">
+            <li class="compare-list-item">
+              <span class="compare-icon bad">&times;</span>
+              <span>Treats an empty development bucket with the same urgency as a mission-critical production customer database.</span>
+            </li>
+            <li class="compare-list-item">
+              <span class="compare-icon bad">&times;</span>
+              <span>Generates hundreds of duplicate "High Severity" alerts, triggering team fatigue and delayed remediation.</span>
+            </li>
+            <li class="compare-list-item">
+              <span class="compare-icon bad">&times;</span>
+              <span>Ignores whether adversaries are actively exploiting the technique in wild ransomware or data theft campaigns.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="compare-card featured">
+          <span class="compare-badge-featured">AI-CSPM Approach</span>
+          <h3 class="compare-card-title">AI-Fused Intelligence</h3>
+          <p class="compare-card-subtitle">Context &amp; Threat-Aware Reranking</p>
+          <ul class="compare-list">
+            <li class="compare-list-item">
+              <span class="compare-icon good">&#10003;</span>
+              <span>Weights findings by asset criticality and real-world TTP frequency across CISA, Mandiant, and Unit 42 reports.</span>
+            </li>
+            <li class="compare-list-item">
+              <span class="compare-icon good">&#10003;</span>
+              <span>Surfaces active attack paths to the top of the queue so security teams mitigate genuine business exposure first.</span>
+            </li>
+            <li class="compare-list-item">
+              <span class="compare-icon good">&#10003;</span>
+              <span>Transparent, explainable mathematical score that connects directly to MITRE ATT&amp;CK tactics and verified fix steps.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Live Security Operations Dashboard
+       ======================================================================== -->
+  <section id="dashboard" class="dashboard-section">
+    <div class="container">
+      <div class="dashboard-container">
+        <!-- HUD Header & Controls -->
+        <div class="dashboard-top-hud">
+          <div class="dashboard-heading-box">
+            <h2>Security Posture Dashboard</h2>
+            <p>Inspect real scan runs, upload cloud configurations, or simulate attack scenarios.</p>
+          </div>
+
+          <div class="hud-controls-group">
+            <div class="hud-select-wrap">
+              <label for="runSelect">Scan Run:</label>
+              <select id="runSelect" class="custom-select" aria-label="Select scan run"></select>
+            </div>
+            <button id="demoBtn" type="button" class="btn btn-primary btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Run Demo Scan
+            </button>
+            <label class="btn btn-secondary btn-sm file-upload-label" id="fileUploadBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Scan Your Config</span>
+              <input id="fileInput" type="file" accept=".json,.yaml,.yml,.tf">
+            </label>
+          </div>
+        </div>
+
+        <!-- Authentication Required Lock Card (Shown when auth is enabled and user is unauthenticated) -->
+        <div id="dashboardAuthLock" class="dashboard-lock-card" style="display: none;">
+          <div class="lock-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 class="lock-title">Security Dashboard Protected</h3>
+          <p class="lock-desc">
+            Authentication is required to view live cloud findings, inspect attack paths, and trigger scans. Please sign in with your credentials to access the console.
+          </p>
+          <a href="/login" class="btn btn-primary btn-md">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+            Sign In to Dashboard
+          </a>
+        </div>
+
+        <div id="dashboardLiveContent">
+          <!-- Live Status Message -->
+          <div id="status" class="hud-status-banner" role="status" aria-live="polite"></div>
+
+        <!-- Summary Metrics Row -->
+        <div id="metrics" class="metrics-row" aria-label="Summary Metrics">
+          <!-- Populated dynamically by app.js with demo/live indicators -->
+        </div>
+
+        <!-- Dashboard Navigation Tabs -->
+        <div class="dashboard-tabs" role="tablist" aria-label="Dashboard Views">
+          <button role="tab" class="tab-btn active tab" data-tab="findings" aria-selected="true">Findings Explorer</button>
+          <button role="tab" class="tab-btn tab" data-tab="compare" aria-selected="false">Baseline vs Fused</button>
+          <button role="tab" class="tab-btn tab" data-tab="paths" aria-selected="false">Attack Paths</button>
+          <button role="tab" class="tab-btn tab" data-tab="compliance" aria-selected="false">Compliance Frameworks</button>
+          <button role="tab" class="tab-btn tab" data-tab="cti" aria-selected="false">Threat Intel Evidence</button>
+          <button role="tab" class="tab-btn tab" data-tab="eval" aria-selected="false">Evaluation Benchmarks</button>
+        </div>
+
+        <!-- Tab 1: Findings Table -->
+        <div id="tab-findings" class="tab-panel">
+          <div class="table-toolbar">
+            <div class="search-box-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="search" type="search" class="search-input" placeholder="Search resource, check ID, title, or technique..." aria-label="Search findings">
+            </div>
+            <div class="filters-group">
+              <select id="priorityFilter" class="custom-select" aria-label="Filter by priority">
+                <option value="">All Priorities</option>
+                <option>Critical</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+              </select>
+              <select id="categoryFilter" class="custom-select" aria-label="Filter by category">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tablewrap">
+            <table id="findingsTable" aria-label="Security Findings Table"></table>
+          </div>
+          <div class="table-hint-text">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Click any row to open the complete finding explanation and remediation guide. Click column headers to sort.
+          </div>
+        </div>
+
+        <!-- Tab 2: Baseline vs Fused Ranking -->
+        <div id="tab-compare" class="tab-panel hidden">
+          <p class="eval-note" style="margin-bottom: 1.25rem;">
+            <strong>Rank #1 is the highest priority.</strong> Naive baseline ranking uses rule severity alone. Fused ranking accounts for asset criticality and empirical CTI threat frequency: <em>Severity &times; Criticality &times; (1 + CTI Weight)</em>.
+          </p>
+          <div id="bars"></div>
+          <div class="tablewrap">
+            <table id="compareTable" aria-label="Baseline vs Fused Comparison Table"></table>
+          </div>
+        </div>
+
+        <!-- Tab: Attack Paths -->
+        <div id="tab-paths" class="tab-panel hidden">
+          <p class="eval-note" style="margin-bottom: 1.25rem;">
+            <strong>Multi-Stage Attack Path Analysis:</strong> Analyzes topological relationships between public exposure, identity permissions, credentials, and sensitive assets to uncover dangerous chained attack paths.
+          </p>
+          <div id="pathsBody"></div>
+        </div>
+
+        <!-- Tab: Compliance Frameworks -->
+        <div id="tab-compliance" class="tab-panel hidden">
+          <p class="eval-note" style="margin-bottom: 1.25rem;">
+            <strong>Framework Compliance Audits:</strong> Independent mappings to <em>CIS AWS Foundations Benchmark v1.4.0</em> and <em>NIST SP 800-53 Rev 5</em>, explicitly separating Passed, Failed, and Unassessed controls.
+          </p>
+          <div id="complianceBody"></div>
+        </div>
+
+        <!-- Tab 3: CTI Evidence -->
+        <div id="tab-cti" class="tab-panel hidden">
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 0.85rem;">CTI Reports Referencing ATT&amp;CK Techniques</h3>
+          <div id="ctiBars"></div>
+          <div class="tablewrap">
+            <table id="ctiTable" aria-label="Cyber Threat Intelligence Evidence Table"></table>
+          </div>
+        </div>
+
+        <!-- Tab 4: Evaluation Benchmarks -->
+        <div id="tab-eval" class="tab-panel hidden">
+          <div id="evalBody"></div>
+        </div>
+        </div><!-- /#dashboardLiveContent -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Documentation & Reference Section
+       ======================================================================== -->
+  <section id="documentation" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Documentation</span>
+        <h2 class="section-title">Architecture &amp; Security Models</h2>
+        <p class="section-subtitle">
+          Transparent, deterministic, and verifiable. Understand how AI-CSPM evaluates posture and calculates risk.
+        </p>
+      </div>
+
+      <div class="docs-grid">
+        <div class="doc-card">
+          <h3 class="doc-card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+            Risk Fusion Formula
+          </h3>
+          <p class="doc-card-desc">
+            Raw risk combines static rule severity with asset criticality and CTI frequency:
+          </p>
+          <div class="doc-formula-box">
+            Raw = Severity &times; AssetCriticality &times; (1 + CTI_weight)
+          </div>
+          <p class="doc-card-desc">
+            CTI weight &isin; [0, 1] boosts findings up to 2&times; when confirmed in threat reports, without ever zeroing out non-CTI issues.
+          </p>
+        </div>
+
+        <div class="doc-card">
+          <h3 class="doc-card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10v10H7z"/></svg>
+            Supported Checks
+          </h3>
+          <p class="doc-card-desc">
+            Built-in deterministic rules covering key misconfigurations:
+          </p>
+          <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+            <li>S3 Public Read &amp; Unencrypted Buckets</li>
+            <li>IAM Administrator Wildcard Policies &amp; Inactive Keys</li>
+            <li>Security Groups 0.0.0.0/0 SSH (22) &amp; RDP (3389)</li>
+            <li>Unencrypted RDS Volumes &amp; Open Endpoints</li>
+          </ul>
+        </div>
+
+        <div class="doc-card">
+          <h3 class="doc-card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            API Endpoints
+          </h3>
+          <p class="doc-card-desc">
+            Integrate AI-CSPM directly into your CI/CD pipeline:
+          </p>
+          <div class="doc-formula-box">
+            POST /api/scan &bull; Upload configuration<br>
+            POST /api/scan/demo &bull; Run demo simulation<br>
+            GET /api/runs &bull; List scan history<br>
+            GET /api/runs/&lt;run_id&gt; &bull; Findings &amp; Summary
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Final CTA Banner
+       ======================================================================== -->
+  <section class="container">
+    <div class="cta-banner">
+      <div class="cta-banner-content">
+        <h2 class="cta-title">Ready to Elevate Your Cloud Security Posture?</h2>
+        <p class="cta-desc">
+          Stop drowning in hundreds of unprioritized alerts. Scan your cloud infrastructure with intelligence and defend against real-world threat actors.
+        </p>
+        <div class="cta-actions">
+          <a href="#dashboard" id="ctaScanBtn" class="btn btn-primary btn-lg">Start Security Scan</a>
+          <button id="ctaDemoBtn" type="button" class="btn btn-secondary btn-lg">Run Demo Simulation</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Slide-Over Inspector Drawer
+       ======================================================================== -->
+  <div id="drawerBackdrop" class="drawer-backdrop"></div>
   <aside id="drawer" class="drawer hidden" aria-label="Finding details">
-    <button id="closeDrawer" type="button" aria-label="Close details">&times;</button>
+    <div class="drawer-header">
+      <div class="drawer-title-box">
+        <h3 id="drawerHeading">Finding Details</h3>
+        <span id="drawerBadgeContainer"></span>
+      </div>
+      <button id="closeDrawer" class="close-btn" type="button" aria-label="Close details">&times;</button>
+    </div>
     <div id="drawerBody"></div>
   </aside>
+
+  <!-- ========================================================================
+       Footer
+       ======================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="/" class="brand-link" style="display: inline-flex;">
+            <div class="logo-icon" style="width: 32px; height: 32px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <span>AI-CSPM</span>
+          </a>
+          <p>
+            AI-Driven Cloud Security Posture Management. Deterministic misconfiguration scanning fused with real-world cyber threat intelligence.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-col-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#threat-intel">Threat Intelligence</a></li>
+            <li><a href="#dashboard">Security Dashboard</a></li>
+            <li><a href="#documentation">Documentation</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Frameworks</h4>
+          <ul class="footer-col-links">
+            <li><a href="https://attack.mitre.org/" target="_blank" rel="noopener">MITRE ATT&amp;CK&reg;</a></li>
+            <li><a href="#documentation">Risk Scoring Model</a></li>
+            <li><a href="#documentation">REST API Reference</a></li>
+            <li><a href="https://github.com/boopathi-7546/ai-cspm" target="_blank" rel="noopener">GitHub Repository</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 AI-CSPM. All rights reserved. Built with Python &amp; modern Framer SaaS aesthetics.</span>
+        <span>MITRE ATT&amp;CK&reg; is a registered trademark of The MITRE Corporation.</span>
+      </div>
+    </div>
+  </footer>
 
   <script src="/static/app.js"></script>
 </body>

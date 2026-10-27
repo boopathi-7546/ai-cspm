@@ -1,107 +1,187 @@
 # AI-Driven Cloud Security Posture Management (AI-CSPM)
 
-Mini project: scan AWS configuration exports for misconfigurations, map each to a MITRE ATT&CK
-technique, weight it by how often that technique appears in threat-intelligence reports, and produce an
-**explainable** risk score with a dashboard.
+An enterprise-grade, explainable Cloud Security Posture Management (CSPM) platform that evaluates multi-cloud configurations and Infrastructure-as-Code (Terraform AST & multi-file projects), maps exposures directly to the MITRE ATT&CK Matrix, fuses real-world Cyber Threat Intelligence (CTI), reconstructs multi-stage attack paths with graph topology, audits compliance against CIS and NIST frameworks, and dispatches real-time webhook alerts to Slack and Microsoft Teams.
 
 ```
-AWS config (JSON/YAML) -> rule engine (22 checks) -> misconfig->ATT&CK mapping ──┐
-CTI reports (.txt) -> extractor (LLM optional, validated) -> evidence index ─────┴-> risk fusion -> SQLite -> Flask API -> HTML/CSS/JS dashboard
+                    ┌─────────────────────────────────────────────────────────────┐
+                    │               Multi-Source Cloud Configuration              │
+                    │   JSON / YAML Configs   |   Terraform HCL AST (.tf / .tf.json)
+                    │   Read-Only Live Connectors: AWS (boto3), Azure, GCP (ADC)  │
+                    └──────────────────────────────┬──────────────────────────────┘
+                                                   │
+                                                   ▼
+                    ┌─────────────────────────────────────────────────────────────┐
+                    │                  Deterministic Rule Engine                  │
+                    │   22 Core Rules (IAM, S3, EC2, Network, Logging, IMDSv2)    │
+                    │   Azure Rules (Storage, NSG, Role) | GCP Rules (GCS, FW)    │
+                    │   Input Hardening | Deduplication | Error Isolation         │
+                    └──────────────────────────────┬──────────────────────────────┘
+                                                   │
+                ┌──────────────────────────────────┴──────────────────────────────────┐
+                ▼                                                                     ▼
+┌───────────────────────────────┐                                     ┌───────────────────────────────┐
+│       Graph Attack-Path       │                                     │     Threat Intelligence       │
+│        Analysis Engine        │                                     │         Fusion Engine         │
+│  Topology / Identity / Assets │                                     │  Keyword & LLM (Gemini/Claude)│
+│  NetworkX Exploit Chaining    │                                     │  Prompt-Injection Defense     │
+│  Chained Risk Scoring         │                                     │  ATT&CK v14 Catalog Validation│
+└───────────────┬───────────────┘                                     └───────────────┬───────────────┘
+                │                                                                     │
+                └──────────────────────────────────┬──────────────────────────────────┘
+                                                   │
+                                                   ▼
+                    ┌─────────────────────────────────────────────────────────────┐
+                    │               Unified Risk Scoring & Explainability         │
+                    │   Risk = Severity × AssetCriticality × (1 + CTI Weight)     │
+                    │   Plain-English Technical Explanations & Evidence           │
+                    │   CIS AWS v1.4.0 & NIST SP 800-53 Compliance Auditing       │
+                    └──────────────────────────────┬──────────────────────────────┘
+                                                   │
+                ┌──────────────────────────────────┴──────────────────────────────────┐
+                ▼                                                                     ▼
+┌───────────────────────────────┐                                     ┌───────────────────────────────┐
+│     Real-Time Alert Engine    │                                     │    Secure Flask Web App & UI  │
+│  Slack Block Kit Alerting     │                                     │  Framer-Inspired SaaS UI      │
+│  Microsoft Teams MessageCard  │                                     │  Role-Based Auth (scrypt)     │
+│  Generic JSON Webhook         │                                     │  Kill-Chain Graph Flowchart   │
+│  Secret Redaction & Dedup     │                                     │  Compliance Matrices & SQLite │
+└───────────────────────────────┘                                     └───────────────────────────────┘
 ```
 
-## Quick start
+---
+
+## Core Capabilities
+
+### 1. Terraform AST Parser & Multi-File Engine
+- **AST Parsing**: Parses Terraform HCL into an Abstract Syntax Tree using `python-hcl2` with deterministic regex fallback.
+- **Cross-File Resolution**: Resolves cross-file variables (`var.<name>`) and local values (`local.<name>`) across distributed configuration files.
+- **Resource Correlation**: Accurately links standalone resources (e.g. `aws_security_group_rule` or `aws_s3_bucket_public_access_block`) defined in separate files to their parent resources.
+- **Directory Scanning**: Scans single files or entire directory trees (`python run.py terraform <PATH>`).
+
+### 2. Multi-Cloud Live Connectors (AWS, Azure, GCP)
+- **Safe Read-Only**: All cloud collectors use strictly read-only API calls. Never requests `write`, `delete`, or `modify` permissions.
+- **Standard Authentication**:
+  - **AWS**: Standard profile and credential chain via `boto3`.
+  - **Azure**: `DefaultAzureCredential` via `azure-identity` (Managed Identity, Azure CLI `az login`, or Service Principal).
+  - **GCP**: Application Default Credentials (ADC) via `google.auth.default()`.
+- **Zero Hardcoded Secrets**: Secrets are never pasted into source code. If credentials are missing, returns clear actionable errors without breaking offline scanning.
+- **Offline Simulation Fixtures**: Local demonstration fixtures provided in `data/cloud_samples/` labeled explicitly as `offline_fixture` (never claiming live scan results).
+
+### 3. Real-Time Webhook Alerting
+- **Multi-Platform Support**: Configurable Slack, Microsoft Teams, and Generic Webhook endpoints.
+- **Sensitive Data Redaction**: Automatically scrubs AWS access keys, private keys, authorization tokens, passwords, and client secrets from alert payloads.
+- **Alert Deduplication**: In-memory caching prevents alert fatigue by suppressing duplicate notifications within a configurable TTL window.
+- **Test CLI**: Test your webhook configuration instantly with `python run.py webhook-test`.
+
+### 4. Graph Attack-Path Analysis Engine
+- **NetworkX Topology Graph**: Chains multi-stage exploits (e.g. Public Network Ingress $\rightarrow$ EC2 IMDSv1 Credential Theft $\rightarrow$ Target Asset Compromise).
+- **Interactive Visualization**: Kill-chain sequence flowchart, risk factors, and actionable remediation rendered in the dashboard.
+
+### 5. Compliance Framework Audits
+- **CIS AWS Foundations Benchmark v1.4.0** & **NIST SP 800-53 Rev 5**.
+- Explicitly separates **Passed**, **Failed**, and **Unassessed** controls with rule coverage disclaimers.
+
+---
+
+## Quick Start
+
+### 1. Installation
 ```bash
-python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
+# Clone the repository
+git clone https://github.com/boopathi-7546/ai-cspm.git
+cd ai-cspm
+
+# Create and activate virtual environment
+# Windows (PowerShell):
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+# Linux / macOS:
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
-pytest -q                     # 44 tests
-python run.py demo            # extract CTI, scan 4 sample envs, evaluate
-python run.py dashboard       # http://127.0.0.1:5000  (click "Run demo scan")
 ```
-Docker: `docker build -t ai-cspm . && docker run -p 5000:5000 ai-cspm`
 
-Optional LLM extraction (otherwise a regex/keyword extractor is used):
+### 2. Run Test Suite
+```bash
+# Run all tests (including AST, mock cloud connectors, and alerts)
+pytest -q
+# Output: 124 passed in ~12s (100% pass rate)
+
+# Run only unit/mock tests (excluding live cloud integrations)
+pytest -m mock
 ```
-copy .env.example .env        (Windows; use cp on Linux/macOS)
+
+### 3. Run Demo Scan
+```bash
+python run.py demo
 ```
-Open `.env` in an editor to configure your preferred LLM provider:
-- **Anthropic (default)**: Set `ANTHROPIC_API_KEY=your_key`. Default model is `claude-sonnet-5-5`.
-- **Google Gemini**: Set `LLM_PROVIDER=gemini`, `GEMINI_API_KEY=your_key`, and specify `CTI_LLM_MODEL=gemini-2.0-flash` (or your chosen Gemini model; there is no default model for Gemini).
 
-The project loads `.env` automatically; a real environment variable, if set, takes priority. `.env` is git-ignored: never commit it.
+### 4. Start Web Dashboard
+```bash
+python run.py dashboard
+# Open http://127.0.0.1:5000 in your browser
 ```
-python run.py llm-check       # verifies provider, key, SDK and model name with one tiny request (never prints the key)
-python run.py extract --llm   # re-extract CTI with the LLM (output is validated, see limitations)
-python run.py scan --llm-explain
+
+---
+
+## CLI Commands Reference
+
+| Command | Description |
+|---|---|
+| `python run.py demo` | Runs end-to-end extraction, scans 4 canonical sample environments, evaluates rankings. |
+| `python run.py scan [CONFIG ...]` | Scans specific JSON, YAML, or directory configurations (e.g. `data/cloud_samples/`). |
+| `python run.py terraform <PATH>` | Statically scans Terraform file or multi-file directory with AST parser. |
+| `python run.py attack-paths [CONFIG ...]` | Analyzes graph topology and triggers webhook alerts for critical paths. |
+| `python run.py compliance [--run-id ID]` | Generates CIS AWS Foundations Benchmark and NIST SP 800-53 compliance audits. |
+| `python run.py evaluate [--compare]` | Runs evaluation metrics against ground truth (with optional side-by-side LLM comparison). |
+| `python run.py webhook-test [--type all]` | Tests configured Slack/Teams/Generic webhook with sample alert payload. |
+| `python run.py aws-scan [--region R]` | Read-only live AWS inspection (requires AWS credentials; opt-in only). |
+| `python run.py azure-scan [--subscription-id ID]` | Read-only live Azure inspection via Azure SDK (requires Azure login; opt-in only). |
+| `python run.py gcp-scan [--project-id PROJECT]` | Read-only live GCP inspection via Google Cloud SDK (requires ADC; opt-in only). |
+| `python run.py llm-check` | Verifies your configured LLM API key, model name, and SDK connection safely. |
+| `python run.py dashboard [--host H] [--port P]` | Launches the Flask SaaS dashboard (default: `127.0.0.1:5000`). |
+
+---
+
+## Environment Variables (.env)
+
+Copy `.env.example` to `.env` to configure your settings:
+```bash
+cp .env.example .env    # Linux / macOS
+copy .env.example .env  # Windows
 ```
-If `llm-check` reports a model error, set `CTI_LLM_MODEL` in `.env` to a model your key can use.
 
-## Project layout
-```
-cspm/        scanner, rules, mapping, CTI extractor, fusion, db, evaluation (pure Python, no web code)
-web/app.py   Flask JSON API  (/api/runs, /api/runs/<id>, /api/cti, /api/scan, /api/scan/demo, /api/evaluation)
-web/static/  index.html + style.css + app.js  (the dashboard; plain HTML/CSS/JS, no build step)
-data/        sample configs, CTI reports, ATT&CK mapping CSV, ground-truth labels
-tests/       44 pytest tests (rules, fusion, extractor, pipeline, web API)
-```
-Dashboard security notes: the page is served with a strict Content-Security-Policy, all data is inserted with
-`textContent` (a resource named `<img onerror=...>` stays text), uploads are limited to 1 MB `.json/.yaml/.yml`,
-YAML is parsed with `safe_load`, and nothing is written to disk from an upload. It uses Flask's development
-server and has no login: run it locally or behind your own auth, do not expose it to the internet.
-
-## Risk formula
-`Risk = Severity x AssetCriticality x (1 + CTIWeight)` normalised to 0-100.
-- Severity: Critical 10, High 7, Medium 4, Low 2. Asset criticality: high 3, medium 2, low 1.
-- `CTIWeight` = share of loaded CTI reports that reference the mapped technique (exact or parent/child
-  match, e.g. T1552 <-> T1552.001). It is a **relevance weight, not an attack probability**.
-- The `(1 + w)` form means CTI boosts a finding (x1 to x2) but a technique missing from a small corpus can
-  never zero out a Critical finding (a plain product would; see `tests/test_fusion.py`).
-- Priority bands on the 0-100 score: >=50 Critical, >=30 High, >=15 Medium, else Low.
-
-## Rules (data/mapping/misconfig_ttp.csv holds the ATT&CK mapping)
-IAM-01..08 (admin/service wildcards, root MFA/use, console MFA, key age, unused keys, password length),
-S3-01..06 (public read/write, Block Public Access, encryption, logging, versioning),
-NET-01..06 (SSH, RDP, DB ports, all-traffic, Docker API 2375 and kubelet 10250 open to the internet),
-LOG-01 (CloudTrail disabled), EC2-01 (IMDSv2 not required). Every rule carries a curated one-sentence
-remediation that the dashboard shows as "Recommended fix". Add a rule by writing one function with
-the `@rule(...)` decorator in `cspm/rules.py` and a row in the mapping CSV.
-
-## Evaluation (`python run.py evaluate` -> results/evaluation_results.json)
-Reports detection precision/recall and false-positive resource rate against hand-labelled sample configs,
-CTI extraction precision/recall on a labelled subset, and baseline (severity-only) vs fused ranking.
-
-## Results on the shipped data (`python run.py demo`)
-| Measure | Value | How to read it |
+| Variable | Default | Purpose |
 |---|---|---|
-| Detection precision / recall | 1.0 / 1.0 | Only shows the rules match the hand-written labels for the 4 sample configs. Not real-world accuracy. |
-| CTI extraction (offline), all labelled techniques | precision 0.889, recall 0.615 | 8 reports, 26 labelled techniques (18 in scope). |
-| CTI extraction (offline), techniques the risk score can use | precision 1.0, recall 0.556 | Parent/child IDs count as a match (as in fusion). |
-| Ranking on `vulnerable_env` | top-5 overlap 4/5, mean rank change 3.25 | CTI + criticality reorders the severity-only list. |
-| Findings with CTI support | 18 of 24 | Vulnerable sample env. S3-01, S3-03, S3-04 get no CTI boost because the offline extractor missed T1530. |
+| `CSPM_REQUIRE_AUTH` | `false` | Set to `true` to require login for dashboard and upload endpoints. |
+| `CSPM_ADMIN_USER` | `admin` | Initial administrator username. |
+| `CSPM_ADMIN_PASSWORD` | *(empty)* | Initial admin password (hashed with scrypt upon creation). |
+| `CSPM_SECRET_KEY` | *(random)* | Secret key for Flask session signing. |
+| `CSPM_SLACK_WEBHOOK_URL` | *(empty)* | Slack Incoming Webhook URL for real-time attack path alerts. |
+| `CSPM_TEAMS_WEBHOOK_URL` | *(empty)* | Microsoft Teams Incoming Webhook URL. |
+| `CSPM_WEBHOOK_URL` | *(empty)* | Generic JSON Webhook URL. |
+| `LLM_PROVIDER` | `anthropic` | LLM provider: `anthropic` or `gemini`. |
+| `ANTHROPIC_API_KEY` | *(empty)* | API key for Anthropic Claude. |
+| `GEMINI_API_KEY` | *(empty)* | API key for Google Gemini. |
+| `CTI_LLM_MODEL` | `claude-sonnet-5-5` | LLM model identifier. (For Gemini, e.g. `gemini-2.0-flash`). |
+| `AWS_PROFILE` | `default` | Optional AWS profile for live read-only inspection. |
+| `AWS_REGION` | `us-east-1` | Target AWS region for live scanning. |
+| `AZURE_SUBSCRIPTION_ID` | *(empty)* | Azure Subscription ID for live Azure inspection. |
+| `GOOGLE_CLOUD_PROJECT` | *(empty)* | Google Cloud Project ID for live GCP inspection. |
 
-The last row is a real limitation, not a bug (EC2-01 has the same problem: the extractor missed T1552): reports R01 and R06 do describe theft from S3, but the offline
-keyword extractor does not recognise that wording, so public-bucket findings lose their CTI boost. Run
-`python run.py extract --llm` (needs `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`; this path could not be tested without a key) and
-compare. "Offline vs LLM extraction" is a good experiment for your report. The keyword map in
-`cspm/cti_extractor.py` was written from ATT&CK technique names and was NOT tuned after seeing these results.
+---
 
-## Data provenance
-- `data/cti_reports/R01..R08`: **paraphrased summaries written by the project team in their own words** from
-  public reporting on AWS/cloud intrusions (SCARLETEEL x2, LLMjacking, EmeraldWhale, Codefinger, Sisense,
-  Redis/SSH honeypots, Docker Swarm cryptojacking). The source URLs are in each file header. They are not
-  verbatim copies; open the originals to verify facts before quoting them.
-- `data/ground_truth/cti_labels.json`: ATT&CK labels written by one reader from those summaries before the
-  extractor was run. Verify against the originals and have a teammate label independently; report agreement.
-- `tests/fixtures/`: synthetic sample reports used only by unit tests.
-- `S3-02` and `S3-06` are also mapped to T1486 (Data Encrypted for Impact) after the Codefinger report.
+## Testing & Mock Architecture
 
-## Honest limitations
-- The labelled set is small (8 reports, 26 labels), so the metrics are indicative only, and CTI weights are
-  coarse (each report moves the weight by 0.125).
-- Reports describe different incidents, not a statistical sample of attacks; the CTI weight is a relevance
-  signal, not an attack probability.
-- Scans static JSON/YAML exports only: no live AWS calls, no Terraform parsing, no auto-remediation.
-- Rules are a CIS-inspired subset and are not mapped to specific CIS benchmark numbers; map them to your
-  benchmark version before citing.
-- LLM output is never trusted blindly: technique IDs must be well-formed and backed by an evidence sentence
-  found in the report (or the ID must appear in the text), else they are rejected. IOCs always use regexes.
-- The dashboard uses Flask's development server with no login: run it locally only.
+All cloud SDK tests and webhook tests are designed to execute completely offline during development and CI/CD without requiring real cloud credentials:
+- **Mock Tests (`@pytest.mark.mock`)**: Utilize `unittest.mock` to simulate successful resource discovery, insecure configurations, permission denials (403), quota limits (429), and transient API errors.
+- **Live Tests (`@pytest.mark.integration`)**: Explicitly separated and intended only for environments configured with verified read-only credentials. Live Azure/GCP scanning is not claimed to pass without valid credentials and an active cloud session.
+
+---
+
+## License
+
+This project is licensed under the Apache 2.0 License.

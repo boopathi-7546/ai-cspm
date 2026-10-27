@@ -60,17 +60,28 @@ def compute_risk(severity: str, criticality: str, cti_weight: float) -> tuple[fl
 
 
 def build_explanation(sf: ScoredFinding) -> str:
-    base = f"{sf.resource} ({sf.resource_type}) failed {sf.check_id}: {sf.title}. "
-    tech = ", ".join(sf.technique_ids) or "no technique"
+    tech = ", ".join(sf.technique_ids) or "None mapped"
     if sf.cti_report_count:
-        actors = f" Actors named: {', '.join(sf.cti_actors)}." if sf.cti_actors else ""
-        cti = (f"Mapped to {tech}, which {sf.cti_report_count} of {sf.total_reports} loaded CTI report(s) "
-               f"reference ({', '.join(sf.cti_report_ids)}).{actors} ")
+        actors = f" (threat actors identified: {', '.join(sf.cti_actors)})" if sf.cti_actors else ""
+        cti_text = (
+            f"Active threat intelligence matches {sf.cti_report_count} of {sf.total_reports} loaded report(s) "
+            f"({', '.join(sf.cti_report_ids)}) referencing technique(s) {tech}{actors}. "
+        )
     else:
-        cti = (f"Mapped to {tech}; no loaded CTI report references it, so no CTI boost was applied "
-               f"(severity and asset criticality still drive the score). ")
-    return (base + cti + f"Severity {sf.severity}, asset criticality {sf.criticality}, "
-            f"CTI weight {sf.cti_weight:.2f} -> risk {sf.risk_score}/100 ({sf.priority}).")
+        cti_text = (
+            f"Associated with technique(s) {tech}, with no currently active threat intelligence mentions in the loaded corpus. "
+        )
+
+    evidence_text = f"Configuration evidence: {sf.detail}." if sf.detail else ""
+    return (
+        f"Resource '{sf.resource}' ({sf.resource_type}) failed check {sf.check_id}: {sf.title}. "
+        f"{evidence_text} "
+        f"Why this matters: This misconfiguration creates an exploitable exposure that adversaries can leverage. "
+        f"{cti_text}"
+        f"Risk analysis: Rule severity '{sf.severity}' combined with asset criticality '{sf.criticality}' "
+        f"and CTI empirical weight {sf.cti_weight:.2f} results in a fused risk score of {sf.risk_score}/100 ({sf.priority} priority). "
+        f"Recommended fix: {sf.remediation}"
+    )
 
 
 def score_findings(findings: list[Finding], mapping: dict, evidence_index: dict,

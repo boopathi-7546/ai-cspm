@@ -1,0 +1,6 @@
+Title: Phishing leading to cloud account takeover (sample)
+Source: SAMPLE summary written for this project (synthetic) - replace with a real public CTI report
+Published: n/a
+Actors: PhishNet
+
+PhishNet sent targeted phishing messages (T1566) to harvest employee logins. Where multi-factor authentication was absent, the actor reused the credentials to access cloud accounts (T1078.004), and repeated password guessing (T1110) was seen against accounts that did not respond. Phishing domain: login-portal.example-phish.com.
